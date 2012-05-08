@@ -1,4 +1,7 @@
 class Dafuq
+	default = :json
+	exclude = []
+	
 	##
 	# Creates a new comment. Returns 'ok', 'denied' or the error text.
 	# POST => /comment.new { <i>post_id</i>, <i>username</i>, <i>text</i> }
@@ -7,7 +10,7 @@ class Dafuq
   	set_cookie('id', rng(16)) if not cookie_exists? 'id'
   	set_cookie('username', params[:username])
   	'denied' if Post.first(:id => params[:post_id]) == nil
-    com = Comment.new (
+    com = Comment.new(
     				:post_id => params[:post_id],
     				:user_id => get_cookie('id'),
     				:ip => get_ip,
@@ -25,14 +28,14 @@ class Dafuq
   post '/comment.edit' do
   	'denied' if not cookie_exists? 'id'
     'denied' if not cookie_exists? 'username'
-    com = Comment.first (
+    com = Comment.first(
     				:id => params[:id],
     				:user_id => get_cookie('id'),
     				:ip => get_ip,
     				:username => get_cookie('username')
     )
     'denied' if com == nil
-    update = com.update (
+    update = com.update(
     	:ip => get_ip,
     	:text => params[:text],
     	:updated_at => timestamp
@@ -47,8 +50,8 @@ class Dafuq
   post '/comment.destroy' do
   	'denied' if not cookie_exists? 'id'
     'denied' if not cookie_exists? 'username'
-    com = Comment.first (
-    				:id => params[:id]
+    com = Comment.first(
+    				:id => params[:id],
     				:user_id => get_cookie('id'),
     				:ip => get_ip,
     				:username => get_cookie('username')
@@ -61,8 +64,9 @@ class Dafuq
 	# Shows all the comments.
 	# GET => /comments
 	##
-  get '/comments' do
-    Comment.all.to_json
+  get '/comments.?:format?' do
+  	com = Comment.all
+  	format(com, params[:format] || default, exclude)
   end
 
 	##
@@ -70,7 +74,8 @@ class Dafuq
 	# GET => /comment/<i>id</i>
 	##
   get '/comment/:id' do |id|
-    Comment.first(:id => id).to_json
+  	com = Comment.first(:id => id)
+  	format(com, default, exclude)
   end
 
 	##
@@ -78,7 +83,8 @@ class Dafuq
 	# GET => /comments/post_id=<i>post_id</i>
 	##
   get '/comments/post_id=:id' do |post_id|
-    Comment.all(:post_id => post_id).to_json
+  	com = Comment.all(:post_id => post_id)
+  	format(com, default, exclude)
   end
 
 	##
@@ -86,7 +92,8 @@ class Dafuq
 	# GET => /comments/username=<i>username</i>
 	##
   get '/comments/username=:username' do |username|
-    Comment.first(:username => username).to_json
+    com = Comment.first(:username => username)
+  	format(com, default, exclude)
   end
 
 	##
@@ -94,7 +101,8 @@ class Dafuq
 	# GET => /comments.search/<i>key</i>
 	##
   get '/comments.search/:key' do |key|
-    Comment.find(:text.like => "%#{key}%").to_json
+    com = Comment.find(:text.like => "%#{key}%")
+  	format(com, default, exclude)
   end
 
 	##

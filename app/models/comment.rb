@@ -3,8 +3,7 @@ class Comment
 
   property	:id, Serial
   property  :post_id, Integer
-  property	:user_id, Integer,
-  					:length => 16
+  property	:user_id, Integer
   property :ip, String,
 	  						:format => /^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})?$/,
 								:messages => {

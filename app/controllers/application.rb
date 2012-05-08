@@ -5,7 +5,7 @@ class Dafuq
   end
   
 	set(:probability) { |value| condition { rand <= value } }
-	get '/win', :probability => 0.1 do
+	get '/win', :probability => 0.5 do
 		'yes'
 	end
 	get '/win' do

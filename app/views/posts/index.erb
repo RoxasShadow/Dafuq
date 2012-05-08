@@ -1,5 +1,6 @@
 <div id="posts"></div>
 <form>
+	<%= csrf_tag %>
 	<input type="text" id="post_username" placeholder="Username (leave blank to be anon)" /><br />
 	<textarea id="post_text" placeholder="Text"></textarea><br />
 	<input type="submit" id="new_post" value="Send" />

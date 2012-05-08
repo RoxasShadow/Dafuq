@@ -2,9 +2,8 @@ class Post
   include DataMapper::Resource
 
   property	:id, Serial
-  property	:user_id, Integer,
-  					:length => 16
-  property :ip, String,
+  property	:user_id, Integer
+  property	:ip, String,
 	  						:format => /^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})?$/,
 								:messages => {
 									:format => 'You are strange.'
@@ -31,11 +30,11 @@ class Post
   property  :deleted_at,	ParanoidDateTime
   property  :type,				Discriminator
   
-  has n, :comments
+#  has n, :comments
   
   sanitize :default_mode => :basic
-  
-  before :destroy do
-    comments.destroy
-  end
+#  
+#  before :destroy do
+#    comments.destroy
+#  end
 end

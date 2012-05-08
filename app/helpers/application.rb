@@ -29,7 +29,8 @@ class Dafuq
 		end
 		
 		def format(object, format=:json, exclude=[])
-			object ||= ''
+			return 'notfound' if not object.is_a?(Post) or object.is_a?(Comment) or object.is_a?(Array)
+			return 'notfound' if object.is_a?(Array) and object.length == 0 
 			format = format.to_sym if format.is_a? String
 			case format
 				when :json
@@ -45,7 +46,7 @@ class Dafuq
 			end
 		end
 		
-		def format_available
+		def formats_available
 			[:json, :xml, :csv, :yaml]
 		end
 		

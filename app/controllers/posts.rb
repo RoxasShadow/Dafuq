@@ -1,4 +1,7 @@
 class Dafuq
+	default = :json
+	exclude = []
+	
 	##
 	# Creates a new post. Returns 'ok' or the error text.
 	# POST => /post.new { <i>username</i>, <i>text</i> }
@@ -6,7 +9,7 @@ class Dafuq
   post '/post.new' do
   	set_cookie('id', rng(16)) if not cookie_exists? 'id'
   	set_cookie('username', params[:username])
-    post = Post.new (
+    post = Post.new(
     				:user_id => get_cookie('id'),
     				:ip => get_ip,
     				:username => params[:username],
@@ -23,14 +26,14 @@ class Dafuq
   post '/post.edit' do
   	'denied' if not cookie_exists? 'id'
     'denied' if not cookie_exists? 'username'
-    post = Post.first (
+    post = Post.first(
     				:id => params[:id],
     				:user_id => get_cookie('id'),
     				:ip => get_ip,
     				:username => get_cookie('username')
     )
     'denied' if post == nil
-    update = post.update (
+    update = post.update(
     	:ip => get_ip,
     	:text => params[:text],
     	:updated_at => timestamp
@@ -45,8 +48,8 @@ class Dafuq
   post '/post.destroy' do
   	'denied' if not cookie_exists? 'id'
     'denied' if not cookie_exists? 'username'
-    post = Post.first (
-    				:id => params[:id]
+    post = Post.first(
+    				:id => params[:id],
     				:user_id => get_cookie('id'),
     				:ip => get_ip,
     				:username => get_cookie('username')
@@ -60,7 +63,8 @@ class Dafuq
 	# GET => /posts
 	##
   get '/posts' do
-    Post.all.to_json
+  	post = Post.all
+  	format(post, default, exclude)
   end
 
 	##
@@ -68,7 +72,8 @@ class Dafuq
 	# GET => /post/<i>id</i>
 	##
   get '/post/:id' do |id|
-    Post.first(:id => id).to_json
+  	post = Post.first(:id => id)
+  	format(post, default, exclude)
   end
 
 	##
@@ -76,7 +81,8 @@ class Dafuq
 	# GET => /posts/username=<i>username</i>
 	##
   get '/posts/username=:username' do |username|
-    Post.first(:username => username).to_json
+  	post = Post.all(:username => username)
+  	format(post, default, exclude)
   end
 
 	##
@@ -84,7 +90,8 @@ class Dafuq
 	# GET => /posts.search/<i>key</i>
 	##
   get '/posts.search/:key' do |key|
-    Post.find(:text.like => "%#{key}%").to_json
+  	post = Post.find(:text.like => "%#{key}%")
+  	format(post, default, exclude)
   end
 
 	##
