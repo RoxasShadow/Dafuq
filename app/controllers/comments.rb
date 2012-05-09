@@ -1,6 +1,7 @@
+# Routes and application logic relatives to the comments.
 class Dafuq
-	default = :json
-	exclude = []
+	default = :json # default format
+	exclude = [] # fields to exclude by the output
 	
 	##
 	# Creates a new comment. Returns 'ok', 'denied' or the error text.
@@ -112,4 +113,5 @@ class Dafuq
   get '/comments/:year/:month/:day' do |year, month, day|
     # TODO
   end
+  
 end

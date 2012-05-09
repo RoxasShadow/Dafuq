@@ -1,12 +1,12 @@
 require 'sinatra/base' # framework
-require 'data_mapper' # db
-require 'dm-sqlite-adapter' # sqlite
-require 'dm-serializer' # to_json
-require 'dm-sanitizer' # sanitize
-require 'rack/csrf' # csrf
+require 'data_mapper' # database
+require 'dm-sqlite-adapter' # sqlite database
+require 'dm-serializer' # to_json, to_csv, to_yaml, to_xml methods
+require 'dm-sanitizer' # sanitize (xss protection)
+require 'rack/csrf' # csrf protection
 
 class Dafuq < Sinatra::Base
-  DataMapper.setup(:default, "sqlite3://#{Dir.pwd}/database.db")
+  DataMapper.setup(:default, "sqlite3://#{Dir.pwd}/db/database.db")
 	enable :sessions
 	
 	@title = 'Dafuq'

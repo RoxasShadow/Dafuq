@@ -1,3 +1,4 @@
+# Database model. Explains what the posts are.
 class Post
   include DataMapper::Resource
 

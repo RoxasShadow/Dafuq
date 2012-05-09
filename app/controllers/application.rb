@@ -1,15 +1,29 @@
+# Routes and application logic.
 class Dafuq
 
+  ##
+  # Shows the home.
+  # GET /
+  ##
   get '/' do
-    'Hello, world!'
+    erb :index
   end
   
-	set(:probability) { |value| condition { rand <= value } }
-	get '/win', :probability => 0.5 do
-		'yes'
-	end
-	get '/win' do
-		'nope'
-	end
+  ##
+  # 404 error page
+  # GET
+  ##
+  not_found do
+    erb :'404'
+  end
+
+  ##
+  # Generic error page
+  # GET
+  ##
+  error do
+  	@error = env['sinatra.error']
+    erb :error
+  end
 
 end

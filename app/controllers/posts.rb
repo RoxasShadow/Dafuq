@@ -1,3 +1,4 @@
+# Routes and application logic relatives to the posts.
 class Dafuq
 	default = :json
 	exclude = []

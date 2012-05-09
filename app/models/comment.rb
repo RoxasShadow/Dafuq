@@ -1,3 +1,4 @@
+# Database model. Explains what the comments are.
 class Comment
   include DataMapper::Resource
 
