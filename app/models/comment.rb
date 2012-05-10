@@ -4,7 +4,7 @@ class Comment
 
   property	:id, Serial
   property  :post_id, Integer
-  property	:user_id, Integer
+  property	:user_id, String
   property :ip, String,
 	  						:format => /^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})?$/,
 								:messages => {
@@ -13,7 +13,7 @@ class Comment
   property	:username, String,
 						:required => true,
 						:length => 4..16,
-						:format => /[a-zA-Z0-9_]/,
+						:format => /\A[a-zA-Z0-9_]*\z/,
 						:messages => {
 							:presence => 'Username is required',
 							:format => 'Username must contains only letters, digits, or underscores.',
@@ -21,10 +21,8 @@ class Comment
 						}
   property	:text, Text,
 						:required => true,
-						:length => 1..65535,
 						:messages => {
 							:presence => 'Text is required',
-							:length => 'Text length must be including betweet 1 and 65535 characters.'
 						}
   property	:created_at,	DateTime
   property	:updated_at,	DateTime
@@ -32,7 +30,11 @@ class Comment
   property  :deleted_at,	ParanoidDateTime
   property  :type,				Discriminator
   
-  sanitize :default_mode => :basic
-  
   belongs_to :post
+  
+  before :valid?, :purge
+  def purge
+  	self.username = Rack::Utils.escape_html(self.username)
+  	self.text = Rack::Utils.escape_html(self.text)
+  end
 end

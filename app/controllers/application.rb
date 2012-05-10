@@ -6,7 +6,7 @@ class Dafuq
   # GET /
   ##
   get '/' do
-    erb :index
+    erb :'posts/index'
   end
   
   ##

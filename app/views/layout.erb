@@ -4,10 +4,13 @@
 	<title><%= @title %></title>
 	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
 	<script type="text/javascript" src="javascript/jquery-1.7.2.min.js"></script>
+	<script type="text/javascript" src="javascript/jquery-dateFormat-1.0.js"></script>
+	<script type="text/javascript" src="javascript/jquery.cookie.js"></script>
 	<script type="text/javascript" src="javascript/script.js"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="stylesheets/style.css" />
 </head>
 <body>
+	<div id="notice"><%= @error %></div>
 	<%= yield %>
 </body>
 </html>

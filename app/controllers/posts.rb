@@ -17,7 +17,7 @@ class Dafuq
     				:text => params[:text],
     				:created_at => timestamp
     )
-    return post.save ? 'ok' : post.errors[0]    				
+    return post.save ? 'ok' : post.errors.first.first
   end
   
 	##
@@ -25,15 +25,15 @@ class Dafuq
 	# POST => /post.edit { <i>id</i>, <i>text</i> }
 	##
   post '/post.edit' do
-  	'denied' if not cookie_exists? 'id'
-    'denied' if not cookie_exists? 'username'
+  	return 'denied' if not cookie_exists? 'id'
+    return 'denied' if not cookie_exists? 'username'
     post = Post.first(
     				:id => params[:id],
     				:user_id => get_cookie('id'),
     				:ip => get_ip,
     				:username => get_cookie('username')
     )
-    'denied' if post == nil
+    return 'denied' if post == nil
     update = post.update(
     	:ip => get_ip,
     	:text => params[:text],
@@ -44,18 +44,18 @@ class Dafuq
 
 	##
 	# Deletes a post. Returns 'ok', 'error' or 'denied'.
-	# POST => /post.destroy { <i>id</i>, <i>text</i> }
+	# POST => /post.destroy { <i>id</i> }
 	##
   post '/post.destroy' do
-  	'denied' if not cookie_exists? 'id'
-    'denied' if not cookie_exists? 'username'
+  	return 'denied' if not cookie_exists? 'id'
+    return 'denied' if not cookie_exists? 'username'
     post = Post.first(
     				:id => params[:id],
     				:user_id => get_cookie('id'),
     				:ip => get_ip,
     				:username => get_cookie('username')
     )
-    'denied' if post == nil
+    return 'denied' if post == nil
     return post.destroy ? 'ok' : 'error' # .errors works?  				
   end
 
@@ -63,43 +63,43 @@ class Dafuq
 	# Shows all the posts.
 	# GET => /posts
 	##
-  get '/posts' do
+  get '/posts/?:format?' do |format|
   	post = Post.all
-  	format(post, default, exclude)
+  	format(post, format || default, exclude)
   end
 
 	##
 	# Shows the posts <i>id</i>.
 	# GET => /post/<i>id</i>
 	##
-  get '/post/:id' do |id|
+  get '/post/:id/?:format?' do |id, format|
   	post = Post.first(:id => id)
-  	format(post, default, exclude)
+  	format(post, format || default, exclude)
   end
 
 	##
 	# Shows all the posts created by <i>username</i>.
 	# GET => /posts/username=<i>username</i>
 	##
-  get '/posts/username=:username' do |username|
+  get '/posts/username=:username/?:format?' do |username, format|
   	post = Post.all(:username => username)
-  	format(post, default, exclude)
+  	format(post, format || default, exclude)
   end
 
 	##
 	# Search a post for <i>key</i>.
 	# GET => /posts.search/<i>key</i>
 	##
-  get '/posts.search/:key' do |key|
+  get '/posts.search/:key/?:format?' do |key, format|
   	post = Post.find(:text.like => "%#{key}%")
-  	format(post, default, exclude)
+  	format(post, format || default, exclude)
   end
 
 	##
 	# Shows all the posts created at <i>YYYY/MM/DD</i>.
 	# GET => /posts/<i>year</i>/<i>month</i>/<i>day</i>
 	##
-  get '/posts/:year/:month/:day' do |year, month, day|
+  get '/posts/:year/:month/:day/?:format?' do |year, month, day, format|
     # TODO
   end
 end
