@@ -33,7 +33,12 @@ class Post
   
 #  has n, :comments
   
-  sanitize :default_mode => :basic
+  before :valid?, :purge
+  def purge
+  	self.username = Rack::Utils.escape_html(self.username)
+  	self.text = Rack::Utils.escape_html(self.text)
+  end
+  
 #  
 #  before :destroy do
 #    comments.destroy

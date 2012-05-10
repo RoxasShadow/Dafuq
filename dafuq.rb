@@ -2,7 +2,6 @@ require 'sinatra/base' # framework
 require 'data_mapper' # database
 require 'dm-sqlite-adapter' # sqlite database
 require 'dm-serializer' # to_json, to_csv, to_yaml, to_xml methods
-require 'dm-sanitizer' # sanitize (xss protection)
 require 'rack/csrf' # csrf protection
 
 class Dafuq < Sinatra::Base
