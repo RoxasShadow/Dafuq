@@ -1,9 +1,9 @@
 function Comment() {
-	this.create = function(post_id, username, text, engine) {
+	this.create = function(post_id, username, text, csrf, callback) {
 		$.ajax({
 			type: 'POST',
 			url: '/comment.new',
-			data: { post_id: post_id, username: username, text: text },
+			data: { post_id: post_id, username: username, text: text, _csrf: csrf },
 			dataType: 'text',
 			success: function(data) {
 				callback(data);
@@ -11,11 +11,11 @@ function Comment() {
 		});
 	}
 
-	this.edit = function(id, text, engine) {
+	this.edit = function(id, text, csrf, callback) {
 		$.ajax({
 			type: 'POST',
 			url: '/comment.edit',
-			data: { id: id, text: text },
+			data: { id: id, text: text, _csrf: csrf },
 			dataType: 'text',
 			success: function(data) {
 				callback(data);
@@ -23,11 +23,11 @@ function Comment() {
 		});
 	}
 
-	this.destroy = function(id, engine) {
+	this.destroy = function(id, csrf, callback) {
 		$.ajax({
 			type: 'POST',
 			url: '/comment.destroy',
-			data: { id: id },
+			data: { id: id, _csrf: csrf },
 			dataType: 'text',
 			success: function(data) {
 				callback(data);
@@ -35,7 +35,7 @@ function Comment() {
 		});
 	}
 	
-	this.get = function(id, engine) {
+	this.get = function(id, callback) {
 		$.ajax({
 			type: 'GET',
 			url: '/comment'+ ((id == undefined) ? 's' : '/'+id),
@@ -46,7 +46,7 @@ function Comment() {
 		});
 	}
 	
-	this.getByPost = function(post_id, engine) {
+	this.getByPost = function(post_id, callback) {
 		$.ajax({
 			type: 'GET',
 			url: '/comments/post_id='+post_id,
@@ -57,7 +57,7 @@ function Comment() {
 		});
 	}
 	
-	this.getByUsername = function(username, engine) {
+	this.getByUsername = function(username, callback) {
 		$.ajax({
 			type: 'GET',
 			url: '/comments/username='+username,
@@ -68,7 +68,7 @@ function Comment() {
 		});
 	}
 	
-	this.getBySearch = function(key, engine) {
+	this.getBySearch = function(key, callback) {
 		$.ajax({
 			type: 'GET',
 			url: '/comment.search/'+key,

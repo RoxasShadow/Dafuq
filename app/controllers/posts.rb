@@ -1,19 +1,27 @@
 # Routes and application logic relatives to the posts.
 class Dafuq
-	default = :json
-	exclude = []
+	default = :json # default format
+	exclude = [] # fields to exclude by the output
 	
 	##
 	# Creates a new post. Returns 'ok' or the error text.
 	# POST => /post.new { <i>username</i>, <i>text</i> }
 	##
   post '/post.new' do
-  	set_cookie('id', rng(16)) if not cookie_exists? 'id'
-  	set_cookie('username', params[:username])
+  	username = get_cookie('username')
+  	id = get_cookie('id')
+  	
+  	if username != params[:username] || username == nil || id == nil
+  		username = params[:username]
+  		id = rng(16)
+			set_cookie('id', id)
+			set_cookie('username', username)
+  	end
+  	
     post = Post.new(
-    				:user_id => get_cookie('id'),
+    				:user_id => id,
     				:ip => get_ip,
-    				:username => params[:username],
+    				:username => username,
     				:text => params[:text],
     				:created_at => timestamp
     )
@@ -25,8 +33,7 @@ class Dafuq
 	# POST => /post.edit { <i>id</i>, <i>text</i> }
 	##
   post '/post.edit' do
-  	return 'denied' if not cookie_exists? 'id'
-    return 'denied' if not cookie_exists? 'username'
+  	return 'denied' unless cookie_exists?('id') || cookie_exists?('username')
     post = Post.first(
     				:id => params[:id],
     				:user_id => get_cookie('id'),
@@ -47,8 +54,7 @@ class Dafuq
 	# POST => /post.destroy { <i>id</i> }
 	##
   post '/post.destroy' do
-  	return 'denied' if not cookie_exists? 'id'
-    return 'denied' if not cookie_exists? 'username'
+  	return 'denied' unless cookie_exists?('id') || cookie_exists?('username')
     post = Post.first(
     				:id => params[:id],
     				:user_id => get_cookie('id'),

@@ -8,14 +8,21 @@ class Dafuq
 	# POST => /comment.new { <i>post_id</i>, <i>username</i>, <i>text</i> }
 	##
   post '/comment.new' do
-  	set_cookie('id', rng(16)) if not cookie_exists? 'id'
-  	set_cookie('username', params[:username])
+  	username = get_cookie('username')
+  	id = get_cookie('id')
+  	
+  	if username != params[:username] || username == nil || id == nil
+  		username = params[:username]
+  		id = rng(16)
+			set_cookie('id', id)
+			set_cookie('username', username)
+  	end
   	return 'denied' if Post.first(:id => params[:post_id]) == nil
     com = Comment.new(
     				:post_id => params[:post_id],
-    				:user_id => get_cookie('id'),
+    				:user_id => id,
     				:ip => get_ip,
-    				:username => params[:username],
+    				:username => username,
     				:text => params[:text],
     				:created_at => timestamp
     )
@@ -27,8 +34,7 @@ class Dafuq
 	# POST => /comment.edit { <i>id</i>, <i>text</i> }
 	##
   post '/comment.edit' do
-  	return 'denied' if not cookie_exists? 'id'
-    return 'denied' if not cookie_exists? 'username'
+  	return 'denied' unless cookie_exists?('id') || cookie_exists?('username')
     com = Comment.first(
     				:id => params[:id],
     				:user_id => get_cookie('id'),
@@ -49,8 +55,7 @@ class Dafuq
 	# POST => /comment.destroy { <i>id</i> }
 	##
   post '/comment.destroy' do
-  	return 'denied' if not cookie_exists? 'id'
-    return 'denied' if not cookie_exists? 'username'
+  	return 'denied' unless cookie_exists?('id') || cookie_exists?('username')
     com = Comment.first(
     				:id => params[:id],
     				:user_id => get_cookie('id'),

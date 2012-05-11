@@ -8,9 +8,24 @@
 	<script type="text/javascript" src="javascript/jquery.cookie.js"></script>
 	<script type="text/javascript" src="javascript/script.js"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="stylesheets/style.css" />
+	<script>		
+		$(document).ready(function() {
+			$('#loader').hide();
+			$.ajaxSetup({
+				async: false,
+				beforeSend: function() {
+					$('#loader').show();
+				},
+				complete: function() {
+					$('#loader').hide();
+				}
+			});
+		});
+  </script>
 </head>
 <body>
 	<div id="notice"><%= @error %></div>
+	<div id="loader"><img src="http://jimpunk.net/Loading/wp-content/uploads/loading10.gif" /></div>
 	<%= yield %>
 </body>
 </html>

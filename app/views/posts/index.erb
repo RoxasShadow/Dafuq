@@ -1,15 +1,18 @@
 <script type="text/javascript" src="javascript/post.js"></script>
 <script type="text/javascript" src="javascript/comment.js"></script>
 <script type="text/javascript">
+
 	$(document).ready(function() {
 		if($('#post_username').val() == '' && $.cookie('username') != null)
 			$('#post_username').val($.cookie('username'));
+			
 		post = new Post();
 		comment = new Comment();
 		csrf = $('[name="_csrf"]').val();
 		
 		function refresh() {
 			post.get(undefined, postsHandler);
+			comment.get(undefined, commentsHandler);
 		}
 		
 		function report(text) {
@@ -20,28 +23,29 @@
 			$('#posts').html('');
 			if(data == undefined)
 				return;
-			$('#posts').html('<section>');
 			for(i=0, len=data.length; i<len; ++i) {
 				if(data[i] == undefined || data[i].username == undefined)
 					continue;
-				$('#posts').append('<article id="post_'+data[i].id+'" class="post">');
-					$('#post_'+data[i].id).append('<header>');
-						date = $.format.date(data[i].created_at, 'MM/dd/yyyy') + ' at ' + $.format.date(data[i].created_at, 'HH:mm:ss');
-						$('#post_'+data[i].id).append('Written by '+data[i].username+' the <time pubdate datetime="'+data[i].created_at+'">'+date+'</time>');
-					$('#post_'+data[i].id).append('</header>');
-					$('#post_'+data[i].id).append('<p>'+data[i].text+'</p>');
-					$('#post_'+data[i].id).append('<footer>');
-						$('#post_'+data[i].id).append('<a class="deletePost">Delete</a>');
-					$('#post_'+data[i].id).append('</footer>');
-				$('#post_'+data[i].id).append('</article>');
+				date = $.format.date(data[i].created_at, 'MM/dd/yyyy') + ' at ' + $.format.date(data[i].created_at, 'HH:mm:ss');
+				$('#posts').append('<article id="post_'+data[i].id+'" class="post"><header>Written by '+data[i].username+' the <time pubdate datetime="'+data[i].created_at+'">'+date+'</time></header><p>'+data[i].text+'</p><footer><a class="deletePost" id="deletePost_'+data[i].id+'">Delete</a> | <a class="editPost" id="editPost_'+data[i].id+'">Edit</a></footer><form id="'+data[i].id+'"><%= csrf_tag %><input type="text" class="comment_username" placeholder="Username (leave blank to be anon)" /\><br /\><textarea class="comment_text" placeholder="Text"></textarea><br /\><input type="submit" class="new_comment" value="Send" /\></form></article>');
 			}
-			$('#posts').append('</section>');
 		}
+		
+		function commentsHandler(data) {
+			if(data == undefined)
+				return;
+			for(i=0, len=data.length; i<len; ++i) {
+				if(data[i] == undefined || data[i].username == undefined)
+					continue;
+				date = $.format.date(data[i].created_at, 'MM/dd/yyyy') + ' at ' + $.format.date(data[i].created_at, 'HH:mm:ss');
+				$('#post_'+data[i].post_id).append('<article id="comment_'+data[i].id+'" class="comment"><header>Written by '+data[i].username+' the <time pubdate datetime="'+data[i].created_at+'">'+date+'</time></header><p>'+data[i].text+'</p><footer><a class="deleteComment" id="deleteComment_'+data[i].id+'">Delete</a> | <a class="editComment" id="editComment_'+data[i].id+'">Edit</a></footer></article>');
+			}
+		}			
 		
 		$('.deletePost').live('click', function(e) {
 			e.preventDefault();
 			item = $(this);
-			id = item.parent().parent().find('.post').attr('id').replace('post_', '');
+			id = item.attr('id').replace('deletePost_', '');
 			post.destroy(id, csrf, report);
 			refresh();
 		});
@@ -52,12 +56,30 @@
 			refresh();
 		});
 		
+		$('.new_comment').live('click', function(e) {
+			e.preventDefault();
+			item = $(this);
+			id = item.parent().attr('id');
+			username = item.parent().find('.comment_username').val();
+			text = item.parent().find('.comment_text').val();
+			comment.create(id, username, text, csrf, report);
+			refresh();
+		});
+		
+		$('.deleteComment').live('click', function(e) {
+			e.preventDefault();
+			item = $(this);
+			id = item.attr('id').replace('deleteComment_', '');
+			comment.destroy(id, csrf, report);
+			refresh();
+		});
+		
 		refresh();
 		
 	});
 </script>
 
-<div id="posts"></div>
+<div><section id="posts"></section></div>
 <form>
 	<%= csrf_tag %>
 	<input type="text" id="post_username" placeholder="Username (leave blank to be anon)" /><br />
