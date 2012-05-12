@@ -1,11 +1,16 @@
 <script type="text/javascript" src="javascript/post.js"></script>
 <script type="text/javascript" src="javascript/comment.js"></script>
+
 <script type="text/javascript">
 
 	$(document).ready(function() {
-		if($('#post_username').val() == '' && $.cookie('username') != null)
-			$('#post_username').val($.cookie('username'));
-			
+		function auth() {
+			if($('#post_username').val() == '' && $.cookie('username') != null)
+				$('#post_username').val($.cookie('username'));
+			if($('#username').val() == '' && $.cookie('username') != null)
+				$('#username').val($.cookie('username'));
+		}
+				
 		post = new Post();
 		comment = new Comment();
 		csrf = $('[name="_csrf"]').val();
@@ -16,7 +21,7 @@
 		}
 		
 		function report(text) {
-			$('#notice').html(text);
+				$('#notice_' + (text == 'ok') ? 'good' : 'bad').html(text);
 		}
 		
 		function postsHandler(data) {
@@ -27,9 +32,42 @@
 				if(data[i] == undefined || data[i].username == undefined)
 					continue;
 				date = $.format.date(data[i].created_at, 'MM/dd/yyyy') + ' at ' + $.format.date(data[i].created_at, 'HH:mm:ss');
-				$('#posts').append('<article id="post_'+data[i].id+'" class="post"><header>Written by '+data[i].username+' the <time pubdate datetime="'+data[i].created_at+'">'+date+'</time></header><p>'+data[i].text+'</p><footer><a class="deletePost" id="deletePost_'+data[i].id+'">Delete</a> | <a class="editPost" id="editPost_'+data[i].id+'">Edit</a></footer><form id="'+data[i].id+'"><%= csrf_tag %><input type="text" class="comment_username" placeholder="Username (leave blank to be anon)" /\><br /\><textarea class="comment_text" placeholder="Text"></textarea><br /\><input type="submit" class="new_comment" value="Send" /\></form></article>');
+				$('#posts').append('<article id="post_'+data[i].id+'" class="post"><header>Written by '+data[i].username+' the <time pubdate datetime="'+data[i].created_at+'">'+date+'</time></header><p>'+data[i].text+'</p><footer><a class="replyPost" id="replyPost_'+data[i].id+'">Reply</a> | <a class="deletePost" id="deletePost_'+data[i].id+'">Delete</a> | <a class="editPost" id="editPost_'+data[i].id+'">Edit</a></footer></article>');
 			}
 		}
+		
+		$('.replyPost').live('click', function() {
+			item = $(this);
+			id = item.attr('id').replace('replyPost_', '');
+			$('#post_id').val(id);
+			$('#dialog_form').attr('title', 'Reply').dialog('open');
+		});
+		
+		$('#dialog:ui-dialog').dialog('destroy');
+		$('#dialog_form').dialog({
+			autoOpen: false,
+			width: 350,
+			modal: true,
+			buttons: {
+				"Send comment": function() {
+					item = $(this);
+					id = $('#post_id').val();
+					username = item.parent().find('#username').val();
+					text = item.parent().find('#text').val();
+					comment.create(id, username, text, csrf, report);
+					refresh();
+					$(this).dialog('close');
+				},
+				Cancel: function() {
+					$(this).dialog('close');
+				}
+			},
+			close: function() {
+				$('#username').val('');
+				$('#text').val('');
+				auth();
+			}
+		});
 		
 		function commentsHandler(data) {
 			if(data == undefined)
@@ -56,16 +94,6 @@
 			refresh();
 		});
 		
-		$('.new_comment').live('click', function(e) {
-			e.preventDefault();
-			item = $(this);
-			id = item.parent().attr('id');
-			username = item.parent().find('.comment_username').val();
-			text = item.parent().find('.comment_text').val();
-			comment.create(id, username, text, csrf, report);
-			refresh();
-		});
-		
 		$('.deleteComment').live('click', function(e) {
 			e.preventDefault();
 			item = $(this);
@@ -74,6 +102,7 @@
 			refresh();
 		});
 		
+		auth();
 		refresh();
 		
 	});
@@ -86,3 +115,13 @@
 	<textarea id="post_text" placeholder="Text"></textarea><br />
 	<input type="submit" id="new_post" value="Send" />
 </form>
+
+<div id="dialog_form" title="Dafuq">
+	<form>
+		<%= csrf_tag %>
+		<input type="hidden" id="post_id" value="" />
+		<input type="text" id="username" placeholder="Username (leave blank to be anon)" />
+		<br />
+		<textarea id="text" placeholder="Text"></textarea>
+	</form>
+</div>
