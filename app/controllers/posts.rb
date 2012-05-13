@@ -11,8 +11,9 @@ class Dafuq
   	username = get_cookie('username')
   	id = get_cookie('id')
   	
-  	if username != params[:username] || username == nil || id == nil
+  	if username.empty? || username != params[:username] || username == nil || id == nil
   		username = params[:username]
+  		username = rng(6) if username.empty?
   		id = rng(16)
 			set_cookie('id', id)
 			set_cookie('username', username)

@@ -29,15 +29,11 @@ class Post
   property  :deleted_at,	ParanoidDateTime
   property  :type,				Discriminator
   
-  has n, :comments
+  has n, :comments, :constraint => :destroy
   
   before :save, :purge
   def purge
   	self.username = Rack::Utils.escape_html(self.username)
   	self.text = Rack::Utils.escape_html(self.text)
-  end  
-  
-  before :destroy do
-    comments.destroy
   end
 end

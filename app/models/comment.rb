@@ -32,7 +32,7 @@ class Comment
   
   belongs_to :post
   
-  before :valid?, :purge
+  before :save, :purge
   def purge
   	self.username = Rack::Utils.escape_html(self.username)
   	self.text = Rack::Utils.escape_html(self.text)

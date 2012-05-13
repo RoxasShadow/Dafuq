@@ -4,6 +4,21 @@
 .comment {
 	margin-left: 300px;
 }
-#notice {
-	background-color: yellow;
+.good {
+	background-color: #DFF0D8;
+  border: 1px solid #D6E9C6;
+  border-radius: 4px 4px 4px 4px;
+  color: #468847;
+  margin-bottom: 18px;
+  padding: 8px 35px 8px 14px;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+.bad {
+	background-color: #FCF8E3;
+  border: 1px solid #FBEED5;
+  border-radius: 4px 4px 4px 4px;
+  color: #C09853;
+  margin-bottom: 18px;
+  padding: 8px 35px 8px 14px;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 }

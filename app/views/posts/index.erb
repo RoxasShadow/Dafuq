@@ -18,10 +18,13 @@
 		function refresh() {
 			post.get(undefined, postsHandler);
 			comment.get(undefined, commentsHandler);
+			auth();
 		}
 		
 		function report(text) {
-				$('#notice_' + (text == 'ok') ? 'good' : 'bad').html(text);
+			$('#notice').fadeIn('slow');
+			$('#notice').attr('class', (text == 'ok') ? 'good' : 'bad').html(text);
+			setTimeout("$('#notice').fadeOut('slow');", 5000);
 		}
 		
 		function postsHandler(data) {
