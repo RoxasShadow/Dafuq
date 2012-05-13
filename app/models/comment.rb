@@ -1,3 +1,4 @@
+# encoding: utf-8
 # Database model. Explains what the comments are.
 class Comment
   include DataMapper::Resource
@@ -5,24 +6,24 @@ class Comment
   property	:id, Serial
   property  :post_id, Integer
   property	:user_id, String
-  property :ip, String,
+  property  :ip, String,
 	  						:format => /^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})?$/,
 								:messages => {
-									:format => 'You are strange.'
+									:format => [ :en => 'You are strange.', :it => 'Sei strano.' ]
 								}
   property	:username, String,
 						:required => true,
 						:length => 4..16,
 						:format => /\A[a-zA-Z0-9_]*\z/,
 						:messages => {
-							:presence => 'Username is required',
-							:format => 'Username must contains only letters, digits, or underscores.',
-							:length => 'Username length must be including betweet 4 and 16 characters.'
+							:presence => [ :en => 'Username required.', :it => 'L\'username è richiesto.' ],
+							:format => [ :en => 'Username must contain only letters, numbers and underscores.', :it => 'L\'username deve contenere solo lettere, numeri e underscore.' ],
+							:length => [ :en => 'Username length must be including between 4 and 16 characters.', :it => 'La lunghezza dell\'username deve essere inclusa tra i 4 e i 16 caratteri.' ] 
 						}
   property	:text, Text,
 						:required => true,
 						:messages => {
-							:presence => 'Text is required',
+							:presence => [ :en => 'Text required.', :it => 'Il testo è richiesto.' ]
 						}
   property	:created_at,	DateTime
   property	:updated_at,	DateTime

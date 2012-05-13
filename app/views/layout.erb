@@ -3,12 +3,13 @@
 <head>
 	<title><%= @title %></title>
 	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
-	<script type="text/javascript" src="javascript/jquery-1.7.2.min.js"></script>
-	<script type="text/javascript" src="javascript/jquery-dateFormat-1.0.js"></script>
-	<script type="text/javascript" src="javascript/jquery.cookie.js"></script>
+	<script type="text/javascript" src="javascript/jquery/jquery-1.7.2.min.js"></script>
+	<script type="text/javascript" src="javascript/jquery/jquery-dateFormat-1.0.js"></script>
+	<script type="text/javascript" src="javascript/jquery/jquery.cookie.js"></script>
+	<script type="text/javascript" src="javascript/jquery/jquery-ui-1.8.20.custom.min.js"></script>
+	<script type="text/javascript" src="javascript/core/status.js"></script>
 	<script type="text/javascript" src="javascript/script.js"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="stylesheets/style.css" />
-	<script type="text/javascript" src="javascript/jquery-ui-1.8.20.custom.min.js"></script>
 	<link rel="stylesheet" href="stylesheets/smoothness/jquery-ui-1.8.20.custom.css" />
 	<script>		
 		$(document).ready(function() {
@@ -27,7 +28,7 @@
 </head>
 <body>
 	<div id="notice"></div>
-	<div id="loader"><img src="http://jimpunk.net/Loading/wp-content/uploads/loading10.gif" /></div>
+	<div id="loader"><img src="stylesheets/loader.gif" alt="Loading..." width="49" height="50" /></div>
 	<%= yield %>
 </body>
 </html>

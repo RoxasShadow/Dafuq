@@ -2,16 +2,21 @@
 class Dafuq
 	default = :json # default format
 	exclude = [] # fields to exclude by the output
+	lang = :en # default client browser language
+	
+	before do
+		lang = get_client_language[0, 2].to_sym # default client browser language
+	end
 	
 	##
-	# Creates a new comment. Returns 'ok', 'denied' or the error text.
+	# Creates a new comment. Returns Status::OK, Status::DENIED or the error text.
 	# POST => /comment.new { <i>post_id</i>, <i>username</i>, <i>text</i> }
 	##
   post '/comment.new' do
   	username = get_cookie('username')
   	id = get_cookie('id')
   	
-  	if username.empty? || username != params[:username] || username == nil || id == nil
+  	if username == nil || id == nil || username.empty? || username != params[:username]
   		username = params[:username]
   		username = rng(6) if username.empty?
   		id = rng(16)
@@ -19,7 +24,7 @@ class Dafuq
 			set_cookie('username', username)
   	end
   	
-  	return 'denied' if Post.first(:id => params[:post_id]) == nil
+  	return Status::DENIED if Post.first(:id => params[:post_id]) == nil
     com = Comment.new(
     				:post_id => params[:post_id],
     				:user_id => id,
@@ -28,44 +33,44 @@ class Dafuq
     				:text => params[:text],
     				:created_at => timestamp
     )
-    return com.save ? 'ok' : com.errors.first.first    				
+    return com.save ? Status::OK : com.errors.first.first.first[lang]
   end
   
 	##
-	# Edits a post. Returns 'ok', 'error' or 'denied'.
+	# Edits a post. Returns Status::OK, Status::ERROR or Status::DENIED.
 	# POST => /comment.edit { <i>id</i>, <i>text</i> }
 	##
   post '/comment.edit' do
-  	return 'denied' unless cookie_exists?('id') || cookie_exists?('username')
+  	return Status::DENIED unless cookie_exists?('id') || cookie_exists?('username')
     com = Comment.first(
     				:id => params[:id],
     				:user_id => get_cookie('id'),
     				:ip => get_ip,
     				:username => get_cookie('username')
     )
-    return 'denied' if com == nil
+    return Status::DENIED if com == nil
     update = com.update(
     	:ip => get_ip,
     	:text => params[:text],
     	:updated_at => timestamp
     )
-    return update ? 'ok' : 'error' # .errors works?  				
+    return update ? Status::OK : Status::ERROR # .errors works?  				
   end
 
 	##
-	# Deletes a post. Returns 'ok', 'error' or 'denied'.
+	# Deletes a post. Returns Status::OK, Status::ERROR or Status::DENIED.
 	# POST => /comment.destroy { <i>id</i> }
 	##
   post '/comment.destroy' do
-  	return 'denied' unless cookie_exists?('id') || cookie_exists?('username')
+  	return Status::DENIED unless cookie_exists?('id') || cookie_exists?('username')
     com = Comment.first(
     				:id => params[:id],
     				:user_id => get_cookie('id'),
     				:ip => get_ip,
     				:username => get_cookie('username')
     )
-    return 'denied' if com == nil
-    return com.destroy ? 'ok' : 'error' # .errors works?  				
+    return Status::DENIED if com == nil
+    return com.destroy ? Status::OK : Status::ERROR # .errors works?  				
   end
 
 	##

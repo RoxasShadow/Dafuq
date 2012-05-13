@@ -57,10 +57,15 @@ class Dafuq
 			Rack::Csrf.csrf_tag(env)
 		end
 		
+		# Returns the client browser language
+		def get_client_language
+			request.env['HTTP_ACCEPT_LANGUAGE']
+		end
+		
 		# Formats a DataMapper object.
 		def format(object, format=:json, exclude=[])
-			return 'notfound' unless object.is_a?(Post) or object.is_a?(Comment) or object.is_a?(Array)
-			return 'notfound' if object.is_a?(Array) and object.length == 0 
+			return Status::NOT_FOUND unless object.is_a?(Post) or object.is_a?(Comment) or object.is_a?(Array)
+			return Status::NOT_FOUND if object.is_a?(Array) and object.length == 0 
 			format = format.to_sym if format.is_a? String
 			case format
 				when :json

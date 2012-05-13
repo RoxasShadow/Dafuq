@@ -14,7 +14,7 @@ class Dafuq < Sinatra::Base
   configure do
     set :method_override, true
     set :views, settings.root + '/app/views'
-    set :public_folder, settings.root + "/app/assets"
+    set :public_folder, settings.root + '/app/assets'
   	use Rack::Session::Cookie
   	use Rack::Csrf, :raise => true
   end
