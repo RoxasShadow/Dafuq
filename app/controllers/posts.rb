@@ -10,9 +10,9 @@ class Dafuq
 	
 	##
 	# Creates a new post. Returns Status::OK or the error text.
-	# POST => /post.new { <i>username</i>, <i>text</i> }
+	# POST => /post/new { <i>username</i>, <i>text</i> }
 	##
-  post '/post.new' do
+  post '/post/new' do
   	username = get_cookie('username')
   	id = get_cookie('id')
   	
@@ -36,9 +36,9 @@ class Dafuq
   
 	##
 	# Edits a post. Returns Status::OK, Status::ERROR or Status::DENIED.
-	# POST => /post.edit { <i>id</i>, <i>text</i> }
+	# POST => /post/edit { <i>id</i>, <i>text</i> }
 	##
-  post '/post.edit' do
+  post '/post/edit' do
   	return Status::DENIED unless cookie_exists?('id') || cookie_exists?('username')
     post = Post.first(
     				:id => params[:id],
@@ -57,9 +57,9 @@ class Dafuq
 
 	##
 	# Deletes a post. Returns Status::OK, Status::ERROR or Status::DENIED.
-	# POST => /post.destroy { <i>id</i> }
+	# POST => /post/destroy { <i>id</i> }
 	##
-  post '/post.destroy' do
+  post '/post/destroy' do
   	return Status::DENIED unless cookie_exists?('id') || cookie_exists?('username')
     post = Post.first(
     				:id => params[:id],
@@ -72,46 +72,56 @@ class Dafuq
   end
 
 	##
-	# Shows all the posts.
-	# GET => /posts
+	# Counts all the posts.
+	# GET => /posts/count
 	##
-  get '/posts/?:format?' do |format|
-  	post = Post.all
+  get '/posts/count' do
+  	Post.all.count.to_s
+  end
+
+	##
+	# Shows all the posts.
+	# GET => /posts ( /page=<i>page</i>/per_page=<i>per_page</i>/<i>format</i> )
+	##
+  get '/posts/?page=:page?/?per_page=:per_page?/?:format?' do |page, per_page, format|
+  	per_page = (per_page.is_a?(String) && per_page.numeric?) ? per_page.to_i : 5
+  	page = (page.is_a?(String) && page.numeric?) ? page.to_i : 1
+  	post = Post.page(page, :per_page => per_page)
   	format(post, format || default, exclude)
   end
 
 	##
 	# Shows the posts <i>id</i>.
-	# GET => /post/<i>id</i>
+	# GET => /post/id=<i>id</i> ( /<i>format</i> )
 	##
-  get '/post/:id/?:format?' do |id, format|
+  get '/post/id=:id/?:format?' do |id, format|
   	post = Post.first(:id => id)
   	format(post, format || default, exclude)
   end
 
 	##
 	# Shows all the posts created by <i>username</i>.
-	# GET => /posts/username=<i>username</i>
+	# GET => /posts/username=<i>username</i> ( /<i>page</i>/<i>per_page</i>/<i>format</i> )
 	##
-  get '/posts/username=:username/?:format?' do |username, format|
+  get '/posts/username=:username/?page=:page?/?per_page=:per_page?/?:format?' do |username, page, per_page, format|
   	post = Post.all(:username => username)
   	format(post, format || default, exclude)
   end
 
 	##
 	# Search a post for <i>key</i>.
-	# GET => /posts.search/<i>key</i>
+	# GET => /posts/search/key=<i>key</i> ( /<i>page</i>/<i>per_page</i>/<i>format</i> )
 	##
-  get '/posts.search/:key/?:format?' do |key, format|
+  get '/posts/search/key=:key/?page=:page?/?per_page=:per_page?/?:format?' do |key, page, per_page, format|
   	post = Post.find(:text.like => "%#{key}%")
   	format(post, format || default, exclude)
   end
 
 	##
 	# Shows all the posts created at <i>YYYY/MM/DD</i>.
-	# GET => /posts/<i>year</i>/<i>month</i>/<i>day</i>
+	# GET => /posts/year=<i>year</i>/month=<i>month</i>/day=<i>day</i> ( /<i>page</i>/<i>per_page</i>/<i>format</i> )
 	##
-  get '/posts/:year/:month/:day/?:format?' do |year, month, day, format|
+  get '/posts/year=:year/month=:month/day=:day/?page=:page?/?per_page=:per_page?/?:format?' do |year, month, day, page, per_page, format|
     # TODO
   end
 end

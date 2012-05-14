@@ -10,9 +10,9 @@ class Dafuq
 	
 	##
 	# Creates a new comment. Returns Status::OK, Status::DENIED or the error text.
-	# POST => /comment.new { <i>post_id</i>, <i>username</i>, <i>text</i> }
+	# POST => /comment/new { <i>post_id</i>, <i>username</i>, <i>text</i> }
 	##
-  post '/comment.new' do
+  post '/comment/new' do
   	username = get_cookie('username')
   	id = get_cookie('id')
   	
@@ -38,9 +38,9 @@ class Dafuq
   
 	##
 	# Edits a post. Returns Status::OK, Status::ERROR or Status::DENIED.
-	# POST => /comment.edit { <i>id</i>, <i>text</i> }
+	# POST => /comment/edit { <i>id</i>, <i>text</i> }
 	##
-  post '/comment.edit' do
+  post '/comment/edit' do
   	return Status::DENIED unless cookie_exists?('id') || cookie_exists?('username')
     com = Comment.first(
     				:id => params[:id],
@@ -59,9 +59,9 @@ class Dafuq
 
 	##
 	# Deletes a post. Returns Status::OK, Status::ERROR or Status::DENIED.
-	# POST => /comment.destroy { <i>id</i> }
+	# POST => /comment/destroy { <i>id</i> }
 	##
-  post '/comment.destroy' do
+  post '/comment/destroy' do
   	return Status::DENIED unless cookie_exists?('id') || cookie_exists?('username')
     com = Comment.first(
     				:id => params[:id],
@@ -72,10 +72,18 @@ class Dafuq
     return Status::DENIED if com == nil
     return com.destroy ? Status::OK : Status::ERROR # .errors works?  				
   end
+  
+	##
+	# Counts all the comments of a post.
+	# GET => /comments/count/<i>id</i>
+	##
+  get '/comments/count/id=:id' do |post_id|
+  	Comment.all(:post_id => post_id).count.to_s
+  end
 
 	##
 	# Shows all the comments.
-	# GET => /comments
+	# GET => /comments ( /<i>format</i> )
 	##
   get '/comments/?:format?' do |format|
   	com = Comment.all
@@ -84,25 +92,25 @@ class Dafuq
 
 	##
 	# Shows the comment <i>id</i>.
-	# GET => /comment/<i>id</i>
+	# GET => /comment/<i>id</i> ( /<i>format</i> )
 	##
-  get '/comment/:id/?:format?' do |id, format|
+  get '/comment/id=:id/?:format?' do |id, format|
   	com = Comment.first(:id => id)
   	format(com, format || default, exclude)
   end
 
 	##
 	# Shows all the comments of the post <i>id</i>.
-	# GET => /comments/post_id=<i>post_id</i>
+	# GET => /comments/post_id=<i>post_id</i> ( /<i>format</i> )
 	##
-  get '/comments/post_id=:id/?:format?' do |post_id, format|
+  get '/comments/post_id=:post_id/?:format?' do |post_id, format|
   	com = Comment.all(:post_id => post_id)
   	format(com, format || default, exclude)
   end
 
 	##
 	# Shows all the comments created by <i>username</i>.
-	# GET => /comments/username=<i>username</i>
+	# GET => /comments/username=<i>username</i> ( /<i>format</i> )
 	##
   get '/comments/username=:username/?:format?' do |username, format|
     com = Comment.first(:username => username)
@@ -111,18 +119,18 @@ class Dafuq
 
 	##
 	# Search a comment for <i>key</i>.
-	# GET => /comments.search/<i>key</i>
+	# GET => /comments/search/key=<i>key</i> ( /<i>format</i> )
 	##
-  get '/comments.search/:key/?:format?' do |key, format|
+  get '/comments/search/key=:key/?:format?' do |key, format|
     com = Comment.find(:text.like => "%#{key}%")
   	format(com, format || default, exclude)
   end
 
 	##
 	# Shows all the comments created at <i>YYYY/MM/DD</i>.
-	# GET => /comments/<i>year</i>/<i>month</i>/<i>day</i>
+	# GET => /comments/year=<i>year</i>/month=<i>month</i>/day=<i>day</i> ( /<i>format</i> )
 	##
-  get '/comments/:year/:month/:day/?:format?' do |year, month, day, format|
+  get '/comments/year=:year/month=:month/day=:day/?:format?' do |year, month, day, format|
     # TODO
   end
   

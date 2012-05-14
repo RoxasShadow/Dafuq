@@ -1,8 +1,11 @@
 $(document).ready(function() {
 
-	post = new Post();
+	per_page = 4;
+	post = new Post(per_page);
 	comment = new Comment();
 	csrf = $('[name="_csrf"]').val();
+	pagePost = 1;
+	nPagePost = Math.ceil(post.count() / per_page);
 	refresh();
 
 	function auth() {
@@ -12,8 +15,10 @@ $(document).ready(function() {
 			$('#username').val($.cookie('username'));
 	}
 	
-	function refresh() {
-		post.get(undefined, postsHandler);
+	function refresh(reset) {
+		if(reset === undefined)
+			$('#posts').html('');
+		post.get(undefined, pagePost, postsHandler);
 		comment.get(undefined, commentsHandler);
 		auth();
 	}
@@ -25,14 +30,28 @@ $(document).ready(function() {
 	}
 	
 	function postsHandler(data) {
-		$('#posts').html('');
 		if(data == undefined)
 			return;
 		for(i=0, len=data.length; i<len; ++i) {
 			if(data[i] == undefined || data[i].username == undefined)
 				continue;
 			date = $.format.date(data[i].created_at, 'MM/dd/yyyy') + ' at ' + $.format.date(data[i].created_at, 'HH:mm:ss');
-			$('#posts').append('<article id="post_'+data[i].id+'" class="post"><header>Written by '+data[i].username+' the <time pubdate datetime="'+data[i].created_at+'">'+date+'</time></header><p>'+data[i].text+'</p><footer><a class="replyPost" id="replyPost_'+data[i].id+'">Reply</a> | <a class="deletePost" id="deletePost_'+data[i].id+'">Delete</a> | <a class="editPost" id="editPost_'+data[i].id+'">Edit</a></footer></article>');
+			$('#posts').append('<article id="post_'+data[i].id+'" class="post"><header>Written by '+data[i].username+' the <time pubdate datetime="'+data[i].created_at+'">'+date+'</time></header><p>'+data[i].text+'</p><footer><a class="replyPost" id="replyPost_'+data[i].id+'">Reply</a> | <a class="deletePost" id="deletePost_'+data[i].id+'">Delete</a> | <a class="editPost" id="editPost_'+data[i].id+'">Edit</a></footer></article><hr /\>');
+		}
+		if(nPagePost > pagePost) {
+			$('#morePosts').remove();
+			$('#posts').append('<a id="morePosts">More</a>');
+		}
+	}
+	
+	function commentsHandler(data) {
+		if(data == undefined)
+			return;
+		for(i=0, len=data.length; i<len; ++i) {
+			if(data[i] == undefined || data[i].username == undefined)
+				continue;
+			date = $.format.date(data[i].created_at, 'MM/dd/yyyy') + ' at ' + $.format.date(data[i].created_at, 'HH:mm:ss');
+			$('#post_'+data[i].post_id).append('<article id="comment_'+data[i].id+'" class="comment"><header>Written by '+data[i].username+' the <time pubdate datetime="'+data[i].created_at+'">'+date+'</time></header><p>'+data[i].text+'</p><footer><a class="deleteComment" id="deleteComment_'+data[i].id+'">Delete</a> | <a class="editComment" id="editComment_'+data[i].id+'">Edit</a></footer></article>');
 		}
 	}
 	
@@ -68,22 +87,17 @@ $(document).ready(function() {
 		}
 	});
 	
-	function commentsHandler(data) {
-		if(data == undefined)
-			return;
-		for(i=0, len=data.length; i<len; ++i) {
-			if(data[i] == undefined || data[i].username == undefined)
-				continue;
-			date = $.format.date(data[i].created_at, 'MM/dd/yyyy') + ' at ' + $.format.date(data[i].created_at, 'HH:mm:ss');
-			$('#post_'+data[i].post_id).append('<article id="comment_'+data[i].id+'" class="comment"><header>Written by '+data[i].username+' the <time pubdate datetime="'+data[i].created_at+'">'+date+'</time></header><p>'+data[i].text+'</p><footer><a class="deleteComment" id="deleteComment_'+data[i].id+'">Delete</a> | <a class="editComment" id="editComment_'+data[i].id+'">Edit</a></footer></article>');
-		}
-	}			
-	
 	$('.deletePost').live('click', function(e) {
 		e.preventDefault();
 		id = $(this).attr('id').replace('deletePost_', '');
 		post.destroy(id, csrf, report);
 		refresh();
+	});
+	
+	$('#morePosts').live('click', function(e) {
+		e.preventDefault();
+		++pagePost;
+		refresh(false);
 	});
 	
 	$('#new_post').live('click', function(e) {
@@ -97,5 +111,5 @@ $(document).ready(function() {
 		id = $(this).attr('id').replace('deleteComment_', '');
 		comment.destroy(id, csrf, report);
 		refresh();
-	});	
+	});
 });

@@ -3,6 +3,7 @@ require 'data_mapper' # database
 require 'dm-sqlite-adapter' # sqlite database
 require 'dm-constraints' # :constraint => :destroy
 require 'dm-serializer' # to_json, to_csv, to_yaml, to_xml methods
+require 'dm-pager' # Post.page
 require 'rack/csrf' # csrf protection
 
 class Dafuq < Sinatra::Base

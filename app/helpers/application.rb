@@ -2,7 +2,7 @@
 class Dafuq
 	helpers do
 	
-		# Returns the actual time and data in UTC format.
+		# Returns the actual time and date in UTC format.
 		def timestamp
 			Time.now.getutc
 		end
@@ -57,7 +57,7 @@ class Dafuq
 			Rack::Csrf.csrf_tag(env)
 		end
 		
-		# Returns the client browser language
+		# Returns the preferred language of the user.
 		def get_client_language
 			request.env['HTTP_ACCEPT_LANGUAGE']
 		end

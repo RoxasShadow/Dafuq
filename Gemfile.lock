@@ -26,6 +26,9 @@ GEM
       dm-core (~> 1.2.0)
     dm-migrations (1.2.0)
       dm-core (~> 1.2.0)
+    dm-pager (1.1.0)
+      dm-aggregates (>= 0.10.1)
+      dm-core (>= 0.10.1)
     dm-serializer (1.2.1)
       dm-core (~> 1.2.0)
       fastercsv (~> 1.5.4)
@@ -74,6 +77,7 @@ PLATFORMS
 DEPENDENCIES
   data_mapper
   dm-constraints
+  dm-pager
   dm-serializer
   dm-sqlite-adapter
   rack_csrf

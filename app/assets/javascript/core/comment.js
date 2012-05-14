@@ -2,7 +2,7 @@ function Comment() {
 	this.create = function(post_id, username, text, csrf, callback) {
 		$.ajax({
 			type: 'POST',
-			url: '/comment.new',
+			url: '/comment/new',
 			data: { post_id: post_id, username: username, text: text, _csrf: csrf },
 			dataType: 'text',
 			success: function(data) {
@@ -14,7 +14,7 @@ function Comment() {
 	this.edit = function(id, text, csrf, callback) {
 		$.ajax({
 			type: 'POST',
-			url: '/comment.edit',
+			url: '/comment/edit',
 			data: { id: id, text: text, _csrf: csrf },
 			dataType: 'text',
 			success: function(data) {
@@ -26,7 +26,7 @@ function Comment() {
 	this.destroy = function(id, csrf, callback) {
 		$.ajax({
 			type: 'POST',
-			url: '/comment.destroy',
+			url: '/comment/destroy',
 			data: { id: id, _csrf: csrf },
 			dataType: 'text',
 			success: function(data) {
@@ -34,11 +34,24 @@ function Comment() {
 			}
 		});
 	}
+
+	this.count = function(id) {
+		n = 0;
+		$.ajax({
+			type: 'GET',
+			url: '/comments/count/id='+id,
+			dataType: 'text',
+			success: function(data) {
+				n = parseInt(data);
+			}
+		});
+		return n;
+	}
 	
 	this.get = function(id, callback) {
 		$.ajax({
 			type: 'GET',
-			url: '/comment'+ ((id == undefined) ? 's' : '/'+id),
+			url: '/comment'+ ((id == undefined) ? 's' : '/id='+id),
 			dataType: 'json',
 			success: function(data) {
 				callback(data);
@@ -71,7 +84,7 @@ function Comment() {
 	this.getBySearch = function(key, callback) {
 		$.ajax({
 			type: 'GET',
-			url: '/comment.search/'+key,
+			url: '/comments/search/key='+key,
 			dataType: 'json',
 			success: function(data) {
 				callback(data);
