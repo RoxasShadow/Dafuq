@@ -42,7 +42,7 @@ class Dafuq
 		
 		# Set the cookie with the name "key" and content "value".
 		def set_cookie(key, value)
-			response.set_cookie(key, value)
+			response.set_cookie(key, { :value => value, :path => '/', :expires => Time.now+24*60*60 })
 		end
 		
 		# Deletes the cookie with the name "key".

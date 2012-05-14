@@ -8,7 +8,7 @@ Status = {
 Languages = {
 	'en'				:	1,
 	'it'				: 2
-}
+};
 
 function translate(data) {
 	if(data == Status.OK)

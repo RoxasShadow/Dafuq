@@ -33,7 +33,7 @@ class Dafuq < Sinatra::Base
     set :method_override, true
     set :views, settings.root + '/app/views'
     set :public_folder, settings.root + '/app/assets'
-  	use Rack::Session::Cookie
+  	use Rack::Session::Cookie, :path => '/'
   	use Rack::Csrf, :raise => true
   end
 
