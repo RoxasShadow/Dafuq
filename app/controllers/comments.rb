@@ -19,6 +19,7 @@
 
 # Routes and application logic relatives to the comments.
 class Dafuq
+
 	default = :json # default format
 	exclude = [] # fields to exclude by the output
 	lang = :en # default client browser language
@@ -45,12 +46,12 @@ class Dafuq
   	
   	return Status::DENIED if Post.first(:id => params[:post_id]) == nil
     com = Comment.new(
-    				:post_id => params[:post_id],
-    				:user_id => id,
-    				:ip => get_ip,
-    				:username => username,
-    				:text => params[:text],
-    				:created_at => timestamp
+    	:post_id => params[:post_id],
+    	:user_id => id,
+    	:ip => get_ip,
+    	:username => username,
+    	:text => params[:text],
+    	:created_at => timestamp
     )
     return com.save ? Status::OK : com.errors.first.first.first[lang]
   end
@@ -62,10 +63,10 @@ class Dafuq
   post '/comment/edit' do
   	return Status::DENIED unless cookie_exists?('id') || cookie_exists?('username')
     com = Comment.first(
-    				:id => params[:id],
-    				:user_id => get_cookie('id'),
-    				:ip => get_ip,
-    				:username => get_cookie('username')
+			:id => params[:id],
+			:user_id => get_cookie('id'),
+			:ip => get_ip,
+			:username => get_cookie('username')
     )
     return Status::DENIED if com == nil
     update = com.update(
@@ -83,10 +84,10 @@ class Dafuq
   post '/comment/destroy' do
   	return Status::DENIED unless cookie_exists?('id') || cookie_exists?('username')
     com = Comment.first(
-    				:id => params[:id],
-    				:user_id => get_cookie('id'),
-    				:ip => get_ip,
-    				:username => get_cookie('username')
+			:id => params[:id],
+			:user_id => get_cookie('id'),
+			:ip => get_ip,
+			:username => get_cookie('username')
     )
     return Status::DENIED if com == nil
     return com.destroy ? Status::OK : Status::ERROR # .errors works?  				

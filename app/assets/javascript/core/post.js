@@ -35,6 +35,18 @@ function Post(per_page) {
 		});
 	}
 
+	this.up = function(id, csrf, callback) {
+		$.ajax({
+			type: 'POST',
+			url: '/post/up',
+			data: { id: id, _csrf: csrf },
+			dataType: 'text',
+			success: function(data) {
+				callback(data);
+			}
+		});
+	}
+
 	this.count = function() {
 		n = 0;
 		$.ajax({

@@ -19,9 +19,11 @@
 
 # Routes and application logic relatives to the posts.
 class Dafuq
+
 	default = :json # default format
 	exclude = [] # fields to exclude by the output
 	lang = :en # default client browser language
+	order = [:up.desc, :updated_at.desc] # results order
 	
 	before do
 		lang = get_client_language[0, 2].to_sym # default client browser language
@@ -44,11 +46,11 @@ class Dafuq
   	end
   	
     post = Post.new(
-    				:user_id => id,
-    				:ip => get_ip,
-    				:username => username,
-    				:text => params[:text],
-    				:created_at => timestamp
+    	:user_id => id,
+    	:ip => get_ip,
+    	:username => username,
+    	:text => params[:text],
+    	:created_at => timestamp
     )
     return post.save ? Status::OK : post.errors.first.first.first[lang]
   end
@@ -60,10 +62,10 @@ class Dafuq
   post '/post/edit' do
   	return Status::DENIED unless cookie_exists?('id') || cookie_exists?('username')
     post = Post.first(
-    				:id => params[:id],
-    				:user_id => get_cookie('id'),
-    				:ip => get_ip,
-    				:username => get_cookie('username')
+    	:id => params[:id],
+    	:user_id => get_cookie('id'),
+    	:ip => get_ip,
+    	:username => get_cookie('username')
     )
     return Status::DENIED if post == nil
     update = post.update(
@@ -71,7 +73,7 @@ class Dafuq
     	:text => params[:text],
     	:updated_at => timestamp
     )
-    return update ? Status::OK : Status::ERROR # .errors works?  				
+    return update ? Status::OK : Status::ERROR
   end
 
 	##
@@ -81,13 +83,40 @@ class Dafuq
   post '/post/destroy' do
   	return Status::DENIED unless cookie_exists?('id') || cookie_exists?('username')
     post = Post.first(
-    				:id => params[:id],
-    				:user_id => get_cookie('id'),
-    				:ip => get_ip,
-    				:username => get_cookie('username')
+    	:id => params[:id],
+    	:user_id => get_cookie('id'),
+    	:ip => get_ip,
+    	:username => get_cookie('username')
     )
     return Status::DENIED if post == nil
-    return post.destroy ? Status::OK : Status::ERROR # .errors works?  				
+    return post.destroy ? Status::OK : Status::ERROR
+  end
+  
+	##
+	# Gives an up to the post. Returns Status::OK, Status::ERROR or Status::DENIED.
+	# POST => /post/up { <i>id</i> }
+	##
+  post '/post/up' do
+    post = Post.first(
+    	:id => params[:id]
+    )
+    return Status::DENIED if post == nil || post.user_id == get_cookie('id') || get_ip == post.ip
+    up = Up.first(
+   		:post_id => post.id,
+   		:user_id => get_cookie('id'),
+   		:ip => get_ip
+   	)
+    return Status::DENIED unless up == nil
+    update = post.update(
+    	:up => post.up.to_i + 1
+    )
+    return Status::ERROR unless update
+   	up = Up.new(
+   		:post_id => post.id,
+   		:user_id => get_cookie('id'),
+   		:ip => get_ip
+   	)
+    return up.save ? Status::OK : Status::ERROR
   end
 
 	##
@@ -103,9 +132,17 @@ class Dafuq
 	# GET => /posts ( /page=<i>page</i>/per_page=<i>per_page</i>/<i>format</i> )
 	##
   get '/posts/?page=:page?/?per_page=:per_page?/?:format?' do |page, per_page, format|
+#  	Post.all.each { |p| # Ups cleaning
+#  		if p.up.to_i > 0
+#  			if (timestamp.to_datetime <=> p.created_at) >= 1
+#  				p.update(:up => 0)
+#  				Up.all(:post_id => p.id).destroy
+#  			end
+#  		end
+#  	}
   	per_page = (per_page.is_a?(String) && per_page.numeric?) ? per_page.to_i : 5
   	page = (page.is_a?(String) && page.numeric?) ? page.to_i : 1
-  	post = Post.page(page, :per_page => per_page)
+  	post = Post.page(page, :per_page => per_page, :order => order)
   	format(post, format || default, exclude)
   end
 
@@ -123,7 +160,9 @@ class Dafuq
 	# GET => /posts/username=<i>username</i> ( /<i>page</i>/<i>per_page</i>/<i>format</i> )
 	##
   get '/posts/username=:username/?page=:page?/?per_page=:per_page?/?:format?' do |username, page, per_page, format|
-  	post = Post.all(:username => username)
+  	per_page = (per_page.is_a?(String) && per_page.numeric?) ? per_page.to_i : 5
+  	page = (page.is_a?(String) && page.numeric?) ? page.to_i : 1
+  	post = Post.all(:username => username).page(page, :per_page => per_page, :order => order)
   	format(post, format || default, exclude)
   end
 
@@ -132,7 +171,9 @@ class Dafuq
 	# GET => /posts/search/key=<i>key</i> ( /<i>page</i>/<i>per_page</i>/<i>format</i> )
 	##
   get '/posts/search/key=:key/?page=:page?/?per_page=:per_page?/?:format?' do |key, page, per_page, format|
-  	post = Post.find(:text.like => "%#{key}%")
+  	per_page = (per_page.is_a?(String) && per_page.numeric?) ? per_page.to_i : 5
+  	page = (page.is_a?(String) && page.numeric?) ? page.to_i : 1
+  	post = Post.find(:text.like => "%#{key}%").page(page, :per_page => per_page, :order => order)
   	format(post, format || default, exclude)
   end
 
@@ -143,4 +184,5 @@ class Dafuq
   get '/posts/year=:year/month=:month/day=:day/?page=:page?/?per_page=:per_page?/?:format?' do |year, month, day, page, per_page, format|
     # TODO
   end
+  
 end

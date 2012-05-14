@@ -47,6 +47,8 @@ class Post
   property	:updated_at,	DateTime
   property  :deleted,			ParanoidBoolean
   property  :deleted_at,	ParanoidDateTime
+  property  :up,					Integer,
+  					:default => 0
   property  :type,				Discriminator
   
   has n, :comments, :constraint => :destroy
