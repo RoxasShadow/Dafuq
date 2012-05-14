@@ -7,6 +7,7 @@ $(document).ready(function() {
 	pagePost = 1;
 	nPagePost = Math.ceil(post.count() / per_page);
 	refresh();
+	lang = (navigator.language.substr(0, 2) == 'it') ? Languages.it : Languages.en;
 
 	function auth() {
 		if($('#post_username').val() == '' && $.cookie('username') != null)
@@ -24,8 +25,9 @@ $(document).ready(function() {
 	}
 	
 	function report(text) {
+		text = translate(text);
 		$('#notice').fadeIn('slow');
-		$('#notice').attr('class', (text == Status.OK) ? 'good' : 'bad').html(text);
+		$('#notice').attr('class', (text[0] == Status.OK) ? 'good' : 'bad').html(text[lang]);
 		setTimeout("$('#notice').fadeOut('slow');", 5000);
 	}
 	
