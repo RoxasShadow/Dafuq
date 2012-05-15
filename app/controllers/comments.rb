@@ -142,7 +142,7 @@ class Dafuq
 	# GET => /comments/search/key=<i>key</i> ( /<i>format</i> )
 	##
   get '/comments/search/key=:key/?:format?' do |key, format|
-    com = Comment.find(:text.like => "%#{key}%")
+    com = Comment.all(:text.like => "%#{key}%")
   	format(com, format || default, exclude)
   end
 

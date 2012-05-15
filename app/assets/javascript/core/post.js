@@ -85,7 +85,7 @@ function Post(per_page) {
 	this.getBySearch = function(key, page, callback) {
 		$.ajax({
 			type: 'GET',
-			url: '/post/search/key='+key+'/page='+page+'/per_page='+per_page,
+			url: '/posts/search/key='+key+'/page='+page+'/per_page='+per_page,
 			dataType: 'json',
 			success: function(data) {
 				callback(data);

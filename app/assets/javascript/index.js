@@ -5,6 +5,7 @@ $(document).ready(function() {
 	comment = new Comment();
 	csrf = $('[name="_csrf"]').val();
 	pagePost = 1;
+	pageSearch = 1;
 	nPagePost = Math.ceil(post.count() / per_page);
 	lang = (navigator.language.substr(0, 2) == 'it') ? Languages.it : Languages.en;
 	
@@ -49,6 +50,22 @@ $(document).ready(function() {
 			$('#morePosts').remove();
 			$('#posts').append('<a id="morePosts">More</a>');
 		}
+	}
+	
+	function searchHandler(data) {
+		if(data == undefined)
+			return;
+		for(i=0, len=data.length; i<len; ++i) {
+			if(data[i] == undefined || data[i].username == undefined)
+				continue;
+			date = $.format.date(data[i].created_at, 'MM/dd/yyyy') + ' at ' + $.format.date(data[i].created_at, 'HH:mm:ss');
+			$('#posts').append('<article id="post_'+data[i].id+'" class="post"><header>Written by '+data[i].username+' the <time pubdate datetime="'+data[i].created_at+'">'+date+'</time> (+'+data[i].up+')</header><p>'+data[i].text+'</p><footer><a class="replyPost" id="replyPost_'+data[i].id+'">Reply</a> | <a class="deletePost" id="deletePost_'+data[i].id+'">Delete</a> | <a class="upPost" id="upPost_'+data[i].id+'">Up</a> | <a class="editPost" id="editPost_'+data[i].id+'">Edit</a></footer></article><hr /\>');
+		}
+		if(nPagePost > pagePost) {
+			$('#moreSearch').remove();
+			$('#posts').append('<a id="moreSearch">More</a>');
+		}
+		$('#posts').append('<a id="index">Index</a>');
 	}
 	
 	function commentsHandler(data) {
@@ -127,4 +144,28 @@ $(document).ready(function() {
 		refresh();
 	});
 	
+	function search() {
+		$('#posts').html('');
+		post.getBySearch($('#search').val(), pageSearch, searchHandler);
+	}
+	
+	$('#new_search').live('click', function(e) {
+		e.preventDefault();
+		pagePost = 1;
+		search();
+	});
+	
+	$('#moreSearch').live('click', function(e) {
+		e.preventDefault();
+		++pageSearch;
+		search();
+	});
+	
+	$('#index').live('click', function(e) {
+		e.preventDefault();
+		pageSearch = 1;
+		pagePost = 1;
+		refresh();
+	});
+		
 });

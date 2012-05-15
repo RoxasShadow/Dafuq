@@ -173,7 +173,7 @@ class Dafuq
   get '/posts/search/key=:key/?page=:page?/?per_page=:per_page?/?:format?' do |key, page, per_page, format|
   	per_page = (per_page.is_a?(String) && per_page.numeric?) ? per_page.to_i : 5
   	page = (page.is_a?(String) && page.numeric?) ? page.to_i : 1
-  	post = Post.find(:text.like => "%#{key}%").page(page, :per_page => per_page, :order => order)
+  	post = Post.all(:text.like => "%#{key}%").page(page, :per_page => per_page, :order => order)
   	format(post, format || default, exclude)
   end
 
