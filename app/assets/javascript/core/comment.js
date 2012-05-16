@@ -2,7 +2,7 @@ function Comment() {
 	this.create = function(post_id, username, text, csrf, callback) {
 		$.ajax({
 			type: 'POST',
-			url: '/comment/new',
+			url: '/api/comment/new',
 			data: { post_id: post_id, username: username, text: text, _csrf: csrf },
 			dataType: 'text',
 			success: function(data) {
@@ -14,7 +14,7 @@ function Comment() {
 	this.edit = function(id, text, csrf, callback) {
 		$.ajax({
 			type: 'POST',
-			url: '/comment/edit',
+			url: '/api/comment/edit',
 			data: { id: id, text: text, _csrf: csrf },
 			dataType: 'text',
 			success: function(data) {
@@ -26,7 +26,7 @@ function Comment() {
 	this.destroy = function(id, csrf, callback) {
 		$.ajax({
 			type: 'POST',
-			url: '/comment/destroy',
+			url: '/api/comment/destroy',
 			data: { id: id, _csrf: csrf },
 			dataType: 'text',
 			success: function(data) {
@@ -39,7 +39,7 @@ function Comment() {
 		n = 0;
 		$.ajax({
 			type: 'GET',
-			url: '/comments/count/id='+id,
+			url: '/api/comments/count/id='+id,
 			dataType: 'text',
 			success: function(data) {
 				n = parseInt(data);
@@ -51,7 +51,7 @@ function Comment() {
 	this.get = function(id, callback) {
 		$.ajax({
 			type: 'GET',
-			url: '/comment'+ ((id == undefined) ? 's' : '/id='+id),
+			url: '/api/comment'+ ((id == undefined) ? 's' : '/id='+id),
 			dataType: 'json',
 			success: function(data) {
 				callback(data);
@@ -62,7 +62,7 @@ function Comment() {
 	this.getByPost = function(post_id, callback) {
 		$.ajax({
 			type: 'GET',
-			url: '/comments/post_id='+post_id,
+			url: '/api/comments/post_id='+post_id,
 			dataType: 'json',
 			success: function(data) {
 				callback(data);
@@ -73,7 +73,7 @@ function Comment() {
 	this.getByUsername = function(username, callback) {
 		$.ajax({
 			type: 'GET',
-			url: '/comments/username='+username,
+			url: '/api/comments/username='+username,
 			dataType: 'json',
 			success: function(data) {
 				return data;
@@ -84,7 +84,7 @@ function Comment() {
 	this.getBySearch = function(key, callback) {
 		$.ajax({
 			type: 'GET',
-			url: '/comments/search/key='+key,
+			url: '/api/comments/search/key='+key,
 			dataType: 'json',
 			success: function(data) {
 				callback(data);

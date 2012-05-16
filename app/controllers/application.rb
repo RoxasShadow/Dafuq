@@ -19,14 +19,20 @@
 
 # Routes and application logic.
 class Dafuq
+	attr_accessor :lang
 
+  before do
+		@lang = get_cookie('lang') || get_client_language[0, 2]
+		set_cookie('lang', lang) if cookie_exists?('lang')
+  end
+	
   ##
   # Shows the home.
   # GET /
   ##
   get '/' do
   	@title = 'Dafuq'
-    erb :'posts/index'
+    erb :"posts/index_#{@lang}"
   end
   
   ##

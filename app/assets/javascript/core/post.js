@@ -2,7 +2,7 @@ function Post(per_page) {
 	this.create = function(username, text, csrf, callback) {
 		$.ajax({
 			type: 'POST',
-			url: '/post/new',
+			url: '/api/post/new',
 			data: { username: username, text: text, _csrf: csrf },
 			dataType: 'text',
 			success: function(data) {
@@ -14,7 +14,7 @@ function Post(per_page) {
 	this.edit = function(id, text, csrf, callback) {
 		$.ajax({
 			type: 'POST',
-			url: '/post/edit',
+			url: '/api/post/edit',
 			data: { id: id, text: text, _csrf: csrf },
 			dataType: 'text',
 			success: function(data) {
@@ -26,7 +26,7 @@ function Post(per_page) {
 	this.destroy = function(id, csrf, callback) {
 		$.ajax({
 			type: 'POST',
-			url: '/post/destroy',
+			url: '/api/post/destroy',
 			data: { id: id, _csrf: csrf },
 			dataType: 'text',
 			success: function(data) {
@@ -38,7 +38,7 @@ function Post(per_page) {
 	this.up = function(id, csrf, callback) {
 		$.ajax({
 			type: 'POST',
-			url: '/post/up',
+			url: '/api/post/up',
 			data: { id: id, _csrf: csrf },
 			dataType: 'text',
 			success: function(data) {
@@ -51,7 +51,7 @@ function Post(per_page) {
 		n = 0;
 		$.ajax({
 			type: 'GET',
-			url: '/posts/count',
+			url: '/api/posts/count',
 			dataType: 'text',
 			success: function(data) {
 				n = parseInt(data);
@@ -63,7 +63,7 @@ function Post(per_page) {
 	this.get = function(id, page, callback) {
 		$.ajax({
 			type: 'GET',
-			url: '/post'+ ((id == undefined) ? 's/page='+page+'/per_page='+per_page : '/id='+id),
+			url: '/api/post'+ ((id == undefined) ? 's/page='+page+'/per_page='+per_page : '/id='+id),
 			dataType: 'json',
 			success: function(data) {
 				callback(data);
@@ -74,7 +74,7 @@ function Post(per_page) {
 	this.getByUsername = function(username, page, callback) {
 		$.ajax({
 			type: 'GET',
-			url: '/posts/username='+username+'/page='+page+'/per_page='+per_page,
+			url: '/api/posts/username='+username+(page == undefined ? '' : '/page='+page+'/per_page='+per_page),
 			dataType: 'json',
 			success: function(data) {
 				callback(data);
@@ -85,7 +85,7 @@ function Post(per_page) {
 	this.getBySearch = function(key, page, callback) {
 		$.ajax({
 			type: 'GET',
-			url: '/posts/search/key='+key+'/page='+page+'/per_page='+per_page,
+			url: '/api/posts/search/key='+key+(page == undefined ? '' : '/page='+page+'/per_page='+per_page),
 			dataType: 'json',
 			success: function(data) {
 				callback(data);

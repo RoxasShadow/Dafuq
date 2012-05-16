@@ -22,18 +22,18 @@ class Dafuq
 
 	default = :json # default format
 	exclude = [] # fields to exclude by the output
-	lang = :en # default client browser language
+	@lang = :en # default client browser language
 	order = [:up.desc, :updated_at.desc] # results order
 	
 	before do
-		lang = get_client_language[0, 2].to_sym # default client browser language
+		@lang = (get_cookie('lang') || get_client_language[0, 2]).to_sym
 	end
 	
 	##
 	# Creates a new post. Returns Status::OK or the error text.
 	# POST => /post/new { <i>username</i>, <i>text</i> }
 	##
-  post '/post/new' do
+  post '/api/post/new' do
   	username = get_cookie('username')
   	id = get_cookie('id')
   	
@@ -49,8 +49,7 @@ class Dafuq
     	:user_id => id,
     	:ip => get_ip,
     	:username => username,
-    	:text => params[:text],
-    	:created_at => timestamp
+    	:text => params[:text]
     )
     return post.save ? Status::OK : post.errors.first.first.first[lang]
   end
@@ -59,7 +58,7 @@ class Dafuq
 	# Edits a post. Returns Status::OK, Status::ERROR or Status::DENIED.
 	# POST => /post/edit { <i>id</i>, <i>text</i> }
 	##
-  post '/post/edit' do
+  post '/api/post/edit' do
   	return Status::DENIED unless cookie_exists?('id') || cookie_exists?('username')
     post = Post.first(
     	:id => params[:id],
@@ -70,8 +69,7 @@ class Dafuq
     return Status::DENIED if post == nil
     update = post.update(
     	:ip => get_ip,
-    	:text => params[:text],
-    	:updated_at => timestamp
+    	:text => params[:text]
     )
     return update ? Status::OK : Status::ERROR
   end
@@ -80,7 +78,7 @@ class Dafuq
 	# Deletes a post. Returns Status::OK, Status::ERROR or Status::DENIED.
 	# POST => /post/destroy { <i>id</i> }
 	##
-  post '/post/destroy' do
+  post '/api/post/destroy' do
   	return Status::DENIED unless cookie_exists?('id') || cookie_exists?('username')
     post = Post.first(
     	:id => params[:id],
@@ -96,7 +94,7 @@ class Dafuq
 	# Gives an up to the post. Returns Status::OK, Status::ERROR or Status::DENIED.
 	# POST => /post/up { <i>id</i> }
 	##
-  post '/post/up' do
+  post '/api/post/up' do
     post = Post.first(
     	:id => params[:id]
     )
@@ -120,18 +118,65 @@ class Dafuq
   end
 
 	##
-	# Counts all the posts.
+	# Counts all the posts. Returns Integer.
 	# GET => /posts/count
 	##
-  get '/posts/count' do
+  get '/api/posts/count' do
   	Post.all.count.to_s
   end
 
 	##
-	# Shows all the posts.
+	# Shows the posts <i>id</i>. Returns json or <i>.format</i>.
+	# GET => /post/id=<i>id</i> ( /<i>format</i> )
+	##
+  get '/api/post/id=:id/?:format?' do |id, format|
+  	post = Post.first(:id => id)
+  	format(post, format || default, exclude)
+  end
+
+	##
+	# Shows all the posts created by <i>username</i>. Returns json array or <i>.format</i>.
+	# GET => /posts/username=<i>username</i> ( /<i>page</i>/<i>per_page</i>/<i>format</i> )
+	##
+  get '/api/posts/username=:username/?:page?/?:per_page?/?:format?' do |username, page, per_page, format|
+  	if page == nil
+  		post = Post.all(:username => username)
+  	else
+			per_page = (per_page.is_a?(String) && per_page.numeric?) ? per_page.to_i : 5
+			page = (page.is_a?(String) && page.numeric?) ? page.to_i : 1
+			post = Post.all(:username => username).page(page, :per_page => per_page, :order => order)
+		end
+  	format(post, format || default, exclude)
+  end
+
+	##
+	# Search a post for <i>key</i>. Returns json array or <i>.format</i>.
+	# GET => /posts/search/key=<i>key</i> ( /<i>page</i>/<i>per_page</i>/<i>format</i> )
+	##
+  get '/api/posts/search/key=:key/?:page?/?:per_page?/?:format?' do |key, page, per_page, format|
+  	if page == nil
+			post = Post.all(:text.like => "%#{key}%")
+		else
+			per_page = (per_page.is_a?(String) && per_page.numeric?) ? per_page.to_i : 5
+			page = (page.is_a?(String) && page.numeric?) ? page.to_i : 1
+			post = Post.all(:text.like => "%#{key}%").page(page, :per_page => per_page, :order => order)
+		end
+  	format(post, format || default, exclude)
+  end
+
+	##
+	# Shows all the posts created at <i>YYYY/MM/DD</i>. Returns json array or <i>.format</i>.
+	# GET => /posts/year=<i>year</i>/month=<i>month</i>/day=<i>day</i> ( /<i>page</i>/<i>per_page</i>/<i>format</i> )
+	##
+  get '/api/posts/year=:year/month=:month/day=:day/?:page?/?:per_page?/?:format?' do |year, month, day, page, per_page, format|
+    # TODO
+  end
+
+	##
+	# Shows all the posts. Returns json array or <i>.format</i>.
 	# GET => /posts ( /page=<i>page</i>/per_page=<i>per_page</i>/<i>format</i> )
 	##
-  get '/posts/?page=:page?/?per_page=:per_page?/?:format?' do |page, per_page, format|
+  get '/api/posts/?:page?/?:per_page?/?:format?' do |page, per_page, format|
 #  	Post.all.each { |p| # Ups cleaning
 #  		if p.up.to_i > 0
 #  			if (timestamp.to_datetime <=> p.created_at) >= 1
@@ -140,49 +185,14 @@ class Dafuq
 #  			end
 #  		end
 #  	}
-  	per_page = (per_page.is_a?(String) && per_page.numeric?) ? per_page.to_i : 5
-  	page = (page.is_a?(String) && page.numeric?) ? page.to_i : 1
-  	post = Post.page(page, :per_page => per_page, :order => order)
+		if page == nil
+			post = Post.all
+		else
+			per_page = (per_page.is_a?(String) && per_page.numeric?) ? per_page.to_i : 5
+			page = (page.is_a?(String) && page.numeric?) ? page.to_i : 1
+			post = Post.page(page, :per_page => per_page, :order => order)
+		end
   	format(post, format || default, exclude)
-  end
-
-	##
-	# Shows the posts <i>id</i>.
-	# GET => /post/id=<i>id</i> ( /<i>format</i> )
-	##
-  get '/post/id=:id/?:format?' do |id, format|
-  	post = Post.first(:id => id)
-  	format(post, format || default, exclude)
-  end
-
-	##
-	# Shows all the posts created by <i>username</i>.
-	# GET => /posts/username=<i>username</i> ( /<i>page</i>/<i>per_page</i>/<i>format</i> )
-	##
-  get '/posts/username=:username/?page=:page?/?per_page=:per_page?/?:format?' do |username, page, per_page, format|
-  	per_page = (per_page.is_a?(String) && per_page.numeric?) ? per_page.to_i : 5
-  	page = (page.is_a?(String) && page.numeric?) ? page.to_i : 1
-  	post = Post.all(:username => username).page(page, :per_page => per_page, :order => order)
-  	format(post, format || default, exclude)
-  end
-
-	##
-	# Search a post for <i>key</i>.
-	# GET => /posts/search/key=<i>key</i> ( /<i>page</i>/<i>per_page</i>/<i>format</i> )
-	##
-  get '/posts/search/key=:key/?page=:page?/?per_page=:per_page?/?:format?' do |key, page, per_page, format|
-  	per_page = (per_page.is_a?(String) && per_page.numeric?) ? per_page.to_i : 5
-  	page = (page.is_a?(String) && page.numeric?) ? page.to_i : 1
-  	post = Post.all(:text.like => "%#{key}%").page(page, :per_page => per_page, :order => order)
-  	format(post, format || default, exclude)
-  end
-
-	##
-	# Shows all the posts created at <i>YYYY/MM/DD</i>.
-	# GET => /posts/year=<i>year</i>/month=<i>month</i>/day=<i>day</i> ( /<i>page</i>/<i>per_page</i>/<i>format</i> )
-	##
-  get '/posts/year=:year/month=:month/day=:day/?page=:page?/?per_page=:per_page?/?:format?' do |year, month, day, page, per_page, format|
-    # TODO
   end
   
 end

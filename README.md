@@ -16,3 +16,12 @@ sudo gem install rdoc-sinatra
 rdoc app/controllers/*
 cd doc
 ```
+
+Files to translate:
+
+```
+app/assets/javascript/index_LANG.js
+app/views/posts/index_LANG.erb
+app/models/*.rb # messages
+app/helpers/time.rb # strings
+```

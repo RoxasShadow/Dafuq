@@ -45,16 +45,33 @@ class Comment
 							:presence => [ :en => 'Text required.', :it => 'Il testo è richiesto.' ]
 						}
   property	:created_at,	DateTime
+  property	:created_at_in_words, String
   property	:updated_at,	DateTime
+  property	:updated_at_in_words, String
   property  :deleted,			ParanoidBoolean
   property  :deleted_at,	ParanoidDateTime
+  property	:deleted_at_in_words, String
   property  :type,				Discriminator
   
   belongs_to :post
   
   before :save, :purge
+  
   def purge
   	self.username = Rack::Utils.escape_html(self.username)
   	self.text = Rack::Utils.escape_html(self.text)
   end
+  
+  def created_at_in_words
+  	self.created_at == nil ? nil : Time.now.to_words(self.created_at.to_time)
+  end
+  
+  def updated_at_in_words
+  	self.updated_at == nil ? nil : Time.now.to_words(self.updated_at.to_time)
+  end
+  
+  def deleted_at_in_words
+  	self.deleted_at == nil ? nil : Time.now.to_words(self.deleted_at.to_time)
+  end
+  
 end
