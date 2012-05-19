@@ -7,6 +7,7 @@ $(document).ready(function() {
 	pagePost = 1;
 	nPagePost = Math.ceil(post.count() / per_page);
 	searchActive = false;
+	toBeCleaned = false;
 	
 	auth();
 	refresh();
@@ -55,9 +56,16 @@ $(document).ready(function() {
 	}
 	
 	function postsHandler(data) {
-		if(data == undefined)
-			return;
 		len = data.length;
+		if(toBeCleaned) {
+			$('#alert').removeClass('bad').html('nope').attr('id', 'posts');
+			toBeCleaned = false;
+		}
+		if(data == undefined || !isArray(data) || len == 0) {
+			$('#posts').addClass('bad').html('No posts available.').attr('id', 'alert');
+			toBeCleaned = true;
+			return;
+		}
 		for(i=0; i<len; ++i) {
 			if(data[i] == undefined || data[i].username == undefined)
 				continue;
@@ -75,7 +83,7 @@ $(document).ready(function() {
 	}
 	
 	function commentsHandler(data) {
-		if(data == undefined)
+		if(data == undefined || !isArray(data) || data.length == 0)
 			return;
 		for(i=0, len=data.length; i<len; ++i) {
 			if(data[i] == undefined || data[i].username == undefined)
