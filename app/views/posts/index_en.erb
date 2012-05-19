@@ -2,40 +2,45 @@
 <script type="text/javascript" src="javascript/core/comment.js"></script>
 <script type="text/javascript" src="javascript/index_<%= @lang %>.js"></script>
 
+<div class="tools left">
+	<form>
+		<%= csrf_tag %>
+		<input type="text" id="post_username" placeholder="Username (leave blank to be anon)" /><br />
+		<textarea id="post_text" placeholder="Text"></textarea><br />
+		<input type="submit" id="new_post" value="Send" />
+	</form>
+
+	<div id="sendcomment_dialog" title="Dafuq">
+		<form>
+			<%= csrf_tag %>
+			<input type="hidden" id="sendcomment_dialog_post_id" value="" />
+			<input type="text" id="sendcomment_dialog_username" placeholder="Username (leave blank to be anon)" /><br />
+			<textarea id="sendcomment_dialog_text" placeholder="Text"></textarea>
+		</form>
+	</div>
+
+	<div id="editpost_dialog" title="Dafuq">
+		<form>
+			<%= csrf_tag %>
+			<input type="hidden" id="editpost_dialog_post_id" value="" />
+			<textarea id="editpost_dialog_text" placeholder="Text"></textarea>
+		</form>
+	</div>
+
+	<div id="editcomment_dialog" title="Dafuq">
+		<form>
+			<%= csrf_tag %>
+			<input type="hidden" id="editcomment_dialog_post_id" value="" />
+			<textarea id="editcomment_dialog_text" placeholder="Text"></textarea>
+		</form>
+	</div>
+</div>
+
+<div class="tools right">
+	<form>
+		<input type="text" id="search" placeholder="Search..." /><br />
+		<input type="submit" id="new_search" value="Search" />
+	</form>
+</div>
+
 <div><section id="posts"></section></div>
-<form>
-	<%= csrf_tag %>
-	<input type="text" id="post_username" placeholder="Username (leave blank to be anon)" /><br />
-	<textarea id="post_text" placeholder="Text"></textarea><br />
-	<input type="submit" id="new_post" value="Send" />
-</form>
-
-<div id="sendcomment_dialog" title="Dafuq">
-	<form>
-		<%= csrf_tag %>
-		<input type="hidden" id="sendcomment_dialog_post_id" value="" />
-		<input type="text" id="sendcomment_dialog_username" placeholder="Username (leave blank to be anon)" />
-		<br />
-		<textarea id="sendcomment_dialog_text" placeholder="Text"></textarea>
-	</form>
-</div>
-
-<div id="editpost_dialog" title="Dafuq">
-	<form>
-		<%= csrf_tag %>
-		<input type="hidden" id="editpost_dialog_post_id" value="" />
-		<textarea id="editpost_dialog_text" placeholder="Text"></textarea>
-	</form>
-</div>
-
-<div id="editcomment_dialog" title="Dafuq">
-	<form>
-		<%= csrf_tag %>
-		<input type="hidden" id="editcomment_dialog_post_id" value="" />
-		<textarea id="editcomment_dialog_text" placeholder="Text"></textarea>
-	</form>
-</div>
-
-<form>
-	<input type="text" id="search" placeholder="Search..." /><input type="submit" id="new_search" value="Search" />
-</form>

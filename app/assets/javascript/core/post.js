@@ -63,7 +63,7 @@ function Post(per_page) {
 	this.get = function(id, page, callback) {
 		$.ajax({
 			type: 'GET',
-			url: '/api/post'+ ((id == undefined) ? 's/page='+page+'/per_page='+per_page : '/id='+id),
+			url: '/api/post'+ ((id == undefined) ? 's/'+page+'/'+per_page : '/id='+id),
 			dataType: 'json',
 			success: function(data) {
 				callback(data);
@@ -74,7 +74,7 @@ function Post(per_page) {
 	this.getByUsername = function(username, page, callback) {
 		$.ajax({
 			type: 'GET',
-			url: '/api/posts/username='+username+(page == undefined ? '' : '/page='+page+'/per_page='+per_page),
+			url: '/api/posts/username='+username+(page == undefined ? '' : '/'+page+'/'+per_page),
 			dataType: 'json',
 			success: function(data) {
 				callback(data);
@@ -85,7 +85,7 @@ function Post(per_page) {
 	this.getBySearch = function(key, page, callback) {
 		$.ajax({
 			type: 'GET',
-			url: '/api/posts/search/key='+key+(page == undefined ? '' : '/page='+page+'/per_page='+per_page),
+			url: '/api/posts/search/key='+key+(page == undefined ? '' : '/'+page+'/'+per_page),
 			dataType: 'json',
 			success: function(data) {
 				callback(data);

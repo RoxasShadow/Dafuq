@@ -1,6 +1,6 @@
 $(document).ready(function() {
 
-	per_page = 4;
+	per_page = 5;
 	post = new Post(per_page);
 	comment = new Comment();
 	csrf = $('[name="_csrf"]').val();
@@ -32,24 +32,26 @@ $(document).ready(function() {
 
 	function translate(data) {
 		if(data == Status.OK)
-			return 'Done.';
+			return ['Done.', Status.OK, 'good'];
 		else if(data == Status.ERROR)
-			return 'Error.';
+			return ['Error.', Status.OK, 'bad'];
 		else if(data == Status.DENIED)
-			return 'Denied.';
+			return ['Denied.', Status.OK, 'bad'];
 		else if(data == Status.NOT_FOUND)
-			return 'Not found.';
+			return ['Not found.', Status.OK, 'bad'];
 		return data;
 	}
 	
 	function report(text) {
 		text = translate(text);
 		$('#notice').fadeIn('slow');
-		if(isArray(text))
-			$('#notice').attr('class', (text[0] == Status.OK) ? 'good' : 'bad').html(text);
+		if(isArray(text)) {
+			notice = text.length == 3;
+			$('#notice').attr('class', (notice ? text[2] : 'bad')).html((notice ? text[0] : text));
+		}
 		else
-			$('#notice').attr('class', (text == Status.OK) ? 'good' : 'bad').html(text);
-		setTimeout("$('#notice').fadeOut('slow');", 5000);
+			$('#notice').attr('class', 'bad').html(text);
+		setTimeout("$('#notice').fadeOut('slow');", 1000);
 	}
 	
 	function postsHandler(data) {
@@ -60,7 +62,7 @@ $(document).ready(function() {
 			if(data[i] == undefined || data[i].username == undefined)
 				continue;
 			edited = data[i].created_at != data[i].updated_at;
-			$('#posts').append('<article id="post_'+data[i].id+'" class="post"><header>Written by '+data[i].username+' <time pubdate datetime="'+data[i].created_at+'">'+data[i].created_at_in_words+'</time> (+'+data[i].up+')</header><p>'+data[i].text+'</p><footer><a class="replyPost" id="replyPost_'+data[i].id+'">Reply</a> | <a class="deletePost" id="deletePost_'+data[i].id+'">Delete</a> | <a class="upPost" id="upPost_'+data[i].id+'">Up</a> | <a class="editPost" id="editPost_'+data[i].id+'">Edit</a>'+(edited ? ' | Last edit <time pubdate datetime="'+data[i].updated_at+'">'+data[i].updated_at_in_words+'</time>' : '')+'</footer></article><hr /\>');
+			$('#posts').append('<article id="post_'+data[i].id+'" class="post"><header>Written by <a href="/user/'+data[i].username+'">'+data[i].username+'</a> <time pubdate datetime="'+data[i].created_at+'">'+data[i].created_at_in_words+'</time> (+'+data[i].up+')</header><p>'+data[i].text+'</p><footer><a class="replyPost" id="replyPost_'+data[i].id+'">Reply</a> | <a class="deletePost" id="deletePost_'+data[i].id+'">Delete</a> | <a class="upPost" id="upPost_'+data[i].id+'">Up</a> | <a class="editPost" id="editPost_'+data[i].id+'">Edit</a>'+(edited ? ' | Last edit <time pubdate datetime="'+data[i].updated_at+'">'+data[i].updated_at_in_words+'</time>' : '')+'</footer></article><hr /\>');
 		}
 		if(!searchActive) {
 			if(nPagePost > pagePost) {
@@ -79,7 +81,7 @@ $(document).ready(function() {
 			if(data[i] == undefined || data[i].username == undefined)
 				continue;
 			edited = data[i].created_at != data[i].updated_at;
-			$('#post_'+data[i].post_id).append('<article id="comment_'+data[i].id+'" class="comment"><header>Written by '+data[i].username+' <time pubdate datetime="'+data[i].created_at+'">'+data[i].created_at_in_words+'</time></header><p>'+data[i].text+'</p><footer><a class="deleteComment" id="deleteComment_'+data[i].id+'">Delete</a> | <a class="editComment" id="editComment_'+data[i].id+'">Edit</a>'+(edited ? ' | Last edit <time pubdate datetime="'+data[i].updated_at+'">'+data[i].updated_at_in_words+'</time>' : '')+'</footer></article>');
+			$('#post_'+data[i].post_id).append('<article id="comment_'+data[i].id+'" class="comment"><header>Written by <a href="/user/'+data[i].username+'">'+data[i].username+'</a> <time pubdate datetime="'+data[i].created_at+'">'+data[i].created_at_in_words+'</time></header><p>'+data[i].text+'</p><footer><a class="deleteComment" id="deleteComment_'+data[i].id+'">Delete</a> | <a class="editComment" id="editComment_'+data[i].id+'">Edit</a>'+(edited ? ' | Last edit <time pubdate datetime="'+data[i].updated_at+'">'+data[i].updated_at_in_words+'</time>' : '')+'</footer></article>');
 		}
 	}
 	
