@@ -15,7 +15,7 @@ $(document).ready(function() {
 	setInterval(function() {
 		if(!searchActive)
 			refresh();
-	}, 50000);
+	}, 5000);
 
 	function auth() {
 		if($('#post_username').val() == '' && $.cookie('username') != null)

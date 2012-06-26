@@ -19,37 +19,37 @@
 
 # Routes and application logic.
 class Dafuq
-	attr_accessor :lang
+   attr_accessor :lang
 
-  before do
-		@lang = get_cookie('lang') || get_client_language[0, 2]
-		set_cookie('lang', lang) if cookie_exists?('lang')
-  end
+   before do
+      @lang = get_cookie('lang') || get_client_language[0, 2]
+      set_cookie('lang', lang) if cookie_exists?('lang')
+   end
 	
-  ##
-  # Shows the home.
-  # GET /
-  ##
-  get '/' do
-  	@title = 'Dafuq'
-    erb :"posts/index_#{@lang}"
-  end
-  
-  ##
-  # 404 error page
-  # GET
-  ##
-  not_found do
-    erb :'404'
-  end
+   ##
+   # Shows the home.
+   # GET /
+   ##
+   get '/' do
+      @title = 'Dafuq'
+      erb :"posts/index_#{@lang}"
+   end
+   
+   ##
+   # 404 error page
+   # GET
+   ##
+   not_found do
+      erb :'404'
+   end
 
-  ##
-  # Generic error page
-  # GET
-  ##
-  error do
-  	@error = env['sinatra.error']
-    erb :error
-  end
+   ##
+   # Generic error page
+   # GET
+   ##
+   error do
+      @error = env['sinatra.error']
+      erb :error
+   end
 
 end
