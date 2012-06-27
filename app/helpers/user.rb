@@ -17,10 +17,24 @@
 # along with Dafuq.  If not, see <http://www.gnu.org/licenses/>.
 #++
 
-class DateTime
-	
-	def to_time
-		return Time.new(self.year, self.month, self.day, self.hour, self.min, self.sec, self.zone)
-	end
+class Dafuq
 
+	helpers do
+
+    def current_user
+      return GuestUser.new unless cookie_exists?('user')
+      user = User.first(:secret => get_cookie('user'))
+      return user || GuestUser.new
+    end
+
+    def logged_in?
+      cookie_exists?('user') && get_cookie('user').length == 10
+    end
+
+    def user_exists?(attributes)
+      !!User.first(attributes)
+    end
+    
+  end
+    
 end

@@ -24,27 +24,26 @@ class Dafuq
 	per_page = 5
 	
 	##
-	# Creates a new post. Returns 'status' => Status::OK | Status::ERROR | Status::DENIED.
-	# POST => /api/<i>format</i>/post/<i>username</i>/new { <i>text</i> }
+	# Creates a new comment. Returns 'status' => Status::OK | Status::ERROR | Status::DENIED.
+	# POST => /api/<i>format</i>/comment/<i>username</i>/<i>id</i>/new { <i>text</i> }
 	##
-  post '/api/:format/post/:username/new' do |format, username|
+  post '/api/:format/comment/:username/:id/new' do |format, username, id|
     return Status::DENIED.format(format, :status) unless logged_in?
     
     inputs = { :text => params[:text] }
     by = current_user
-    to = User.first(:username => username)
+    to = Post.first(:id => id, :user => { :username => username })
     
-    if inputs[:text].empty? || username.empty?
+    if inputs[:text].empty? || username.empty? || !id.numeric?
       return Status::ERROR.format(format, :status)
     elsif to.nil? || by.permission_level == 0
       return Status::DENIED.format(format, :status)
     end
     
-    by.posts << Post.new(
-    	:to => to.username,
+    to.comments << Comment.new(
     	:text => inputs[:text]
     )
-    return by.save ? Status::OK.format(format, :status) : { :status => Status::DENIED, :error => by.errors.first.first }.to_json
+    return to.save ? ?f : ?g#? Status::OK.format(format, :status) : { :status => Status::DENIED, :error => to.errors.first.first }.to_json
   end
   
 	##
@@ -83,7 +82,7 @@ class Dafuq
     inputs = { :id => id, :author => username }
     user = current_user
     author = User.first(:username => inputs[:author])
-    post = Post.first(:id => inputs[:id])
+    post = Posts.first(:id => inputs[:id])
     
     if inputs[:id].empty? || !inputs[:id].numeric? || inputs[:author].empty?
       return Status::ERROR.format(format, :status)

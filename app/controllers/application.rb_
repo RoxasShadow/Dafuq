@@ -17,10 +17,32 @@
 # along with Dafuq.  If not, see <http://www.gnu.org/licenses/>.
 #++
 
-class DateTime
+# Routes and application logic.
+class Dafuq
+
+   before do; end
 	
-	def to_time
-		return Time.new(self.year, self.month, self.day, self.hour, self.min, self.sec, self.zone)
-	end
+   ##
+   # Shows the home.
+   # GET /
+   ##
+   get '/' do; end
+   
+   ##
+   # 404 error page
+   # GET
+   ##
+   not_found do
+      Status.NOT_FOUND
+   end
+
+   ##
+   # Generic error page
+   # GET
+   ##
+   error do
+      #@error = env['sinatra.error']
+      Status.ERROR
+   end
 
 end

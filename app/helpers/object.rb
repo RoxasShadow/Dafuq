@@ -17,39 +17,20 @@
 # along with Dafuq.  If not, see <http://www.gnu.org/licenses/>.
 #++
 
-# Routes and application logic.
-class Dafuq
-   attr_accessor :lang
-
-   before do
-      @lang = get_cookie('lang') || get_client_language[0, 2]
-      set_cookie('lang', lang) if cookie_exists?('lang')
-   end
-	
-   ##
-   # Shows the home.
-   # GET /
-   ##
-   get '/' do
-      @title = 'Dafuq'
-      erb :"posts/index_#{@lang}"
-   end
-   
-   ##
-   # 404 error page
-   # GET
-   ##
-   not_found do
-      erb :'404'
-   end
-
-   ##
-   # Generic error page
-   # GET
-   ##
-   error do
-      @error = env['sinatra.error']
-      erb :error
-   end
-
+class Object
+  
+	def format(format=:json)
+		format = format.to_sym if format.is_a? String
+		case format
+			when :json
+				self.to_json
+			when :xml
+				self.to_xml
+			when :yaml
+				self.to_yaml
+			else
+				self.format(:json)
+		end
+  end
+  
 end

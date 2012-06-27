@@ -17,10 +17,18 @@
 # along with Dafuq.  If not, see <http://www.gnu.org/licenses/>.
 #++
 
-class DateTime
-	
-	def to_time
-		return Time.new(self.year, self.month, self.day, self.hour, self.min, self.sec, self.zone)
-	end
+class GuestUser
 
+  def guest?
+    true
+  end
+
+  def permission_level
+    0
+  end
+
+  def method_missing(m, *args)
+    false
+  end
+  
 end

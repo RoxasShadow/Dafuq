@@ -17,10 +17,10 @@
 # along with Dafuq.  If not, see <http://www.gnu.org/licenses/>.
 #++
 
-class DateTime
-	
-	def to_time
-		return Time.new(self.year, self.month, self.day, self.hour, self.min, self.sec, self.zone)
-	end
+class Fixnum
 
+	def format(format=:json, type)
+    { type => self }.format(format)
+  end
+  
 end

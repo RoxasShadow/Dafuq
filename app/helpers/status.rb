@@ -18,8 +18,17 @@
 #++
 
 module Status
+
+  NOT       = '0'
 	OK 				= '1'
 	ERROR			= '2'
 	DENIED		= '3'
 	NOT_FOUND	= '4'
+	INVALID   = '5'
+	MISSING   = '6'
+	
+	def Status.range
+	  (0..6)
+	end
+	
 end

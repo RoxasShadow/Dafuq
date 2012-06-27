@@ -1,4 +1,3 @@
-# encoding: utf-8
 #--
 # Copyright(C) 2012 Giovanni Capuano <webmaster@giovannicapuano.net>
 #
@@ -18,16 +17,24 @@
 # along with Dafuq.  If not, see <http://www.gnu.org/licenses/>.
 #++
 
-# Database model. Saves the ups to the posts.
-class Up
-  include DataMapper::Resource
-
-  property	:id, Serial
-  property	:post_id, String
-  property	:user_id, String
-  property	:ip, String,
-	  						:format => /^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})?$/,
-								:messages => {
-									:format => [ :en => 'You are strange.', :it => 'Sei strano.' ]
-								}
+class Dafuq
+  helpers do
+  
+		  def set_cookie(key, value)
+			  response.set_cookie(key, { :value => value, :path => '/', :expires => Time.now+24*60*60 })
+		  end
+		
+		  def delete_cookie(key)
+		    response.set_cookie(key, { :value => '', :path => '/', :expires => Time.now })
+		  end
+		
+		  def get_cookie(key)
+			  request.cookies[key]
+		  end
+		
+		  def cookie_exists?(key)
+			  !(get_cookie(key).nil? || get_cookie(key).empty?)
+		  end
+		  
+  end
 end
